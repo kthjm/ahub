@@ -1,0 +1,50 @@
+{
+  "name": "hrehub",
+  "version": "0.0.1",
+  "repository": "kthjm/hrehub",
+  "author": "kthjm <toxictoxer@gmail.com>",
+  "license": "MIT",
+  "main": "",
+  "bin": "",
+  "description": "",
+  "keywords": [],
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
+  "scripts": {
+    "ex:build": "chin -c .example/chin.config.js",
+    "ex:serve": "serve .example/public",
+    "ex": "run-s ex:build ex:serve",
+    "test": "cross-env BABEL_ENV=TEST nyc mocha",
+    "build": "cross-env BABEL_ENV=BUILD rollup -c"
+  },
+  "dependencies": {
+    "chin": "^3.1.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-istanbul": "^4.1.6",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-power-assert": "^2.0.0",
+    "codecov": "^3.0.4",
+    "cross-env": "^5.2.0",
+    "mocha": "^5.2.0",
+    "mock-fs": "^4.5.0",
+    "npm-run-all": "^4.1.3",
+    "nyc": "^12.0.2",
+    "power-assert": "^1.6.0",
+    "rollup": "^0.63.4",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-flow": "^1.1.1",
+    "rollup-plugin-prettier": "^0.4.0",
+    "serve": "^9.4.0"
+  }
+}

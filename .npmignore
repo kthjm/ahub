@@ -1,0 +1,10 @@
+.circleci/
+src/
+test/
+.babelrc
+.gitignore
+chin.config.js
+codecov.yml
+rogo.svg
+rollup.config.js
+yarn.lock
