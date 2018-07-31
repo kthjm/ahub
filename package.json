@@ -23,7 +23,11 @@
     "build": "cross-env BABEL_ENV=BUILD rollup -c"
   },
   "dependencies": {
-    "chin": "^3.1.1"
+    "app-root-path": "^2.1.0",
+    "chin": "^3.1.1",
+    "commander": "^2.16.0",
+    "fs-extra": "^7.0.0",
+    "sitemap": "^1.13.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

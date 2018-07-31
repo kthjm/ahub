@@ -1,67 +1,34 @@
-import chin from 'chin'
-import plugin from './plugin.js'
+import program from 'commander'
+import action from './action.js'
 
-const requireRootConfig = () => {
-  let rootConfig
-  try {
-    rootConfig = rooquire('index.json')
-  }
-  catch (err) {
-    throw err
-  }
-  return rootConfig
-}
+program
+  // .option('-c, --config [path]', `[default: ${CONFIG1} || ${CONFIG2}]`)
+  // .option('-i, --put <path>', `[default: ${PUT}]`)
+  // .option('-o, --out <path>', `[default: ${OUT}]`)
+  // .option('-r, --require <name..>', 'splited by ","')
+  .option('--clean', 'remove "out" before')
+  .option('-q, --quiet')
+  .version(require('../package.json').version, '-v, --version')
+  .on('--help', () => console.log(
+`
+  Example:
+    chin -c -r babel-register,dotenv/config
+`
+  ))
 
-const requireIgnored = () => {
-  let ignored
-  try {
-    ignored = rooquire('.hrefsignore')
-  }
-  catch (err) {
-    ignored = defaultIgnored
-  }
-  return ignored
-}
+program
+  .command('watch')
+  // .option('-c, --config [path]', `[default: ${CONFIG1} || ${CONFIG2}]`)
+  // .option('-i, --put <path>', `[default: ${PUT}]`)
+  // .option('-o, --out <path>', `[default: ${OUT}]`)
+  // .option('-r, --require <name...>', 'splited by ","')
+  .option('--clean', 'remove "out" before')
+  .option('-q, --quiet')
+  .on('--help', () => console.log(``))
+  .action(() => action(program))
 
-const outputFiles = (files) => Promise.all(files.map(arg => outputFile(...arg)))
-const arrjoin = (arr) => arr.join()
+program.parse(process.argv)
 
-const buildFavicons = (rootConfig) => {
-  const { processor, after } = favicons(rootConfig.favicons)
-  return Promise
-  .all([
-    readFile('favicons.png'),
-    { out: process.env.CHIN_OUT + 'favicons.png', msg: () => {}, on: () => {} }
-  ])
-  .then(processor)
-  .then(outputFiles)
-  .then(after)
-  .then(arrjoin)
-}
-
-const buildPages = (rootConfig, favicons) => {
-  const json = plugin(rootConfig, favicons)
-  return requireIgnored()
-  .then(ignored =>
-    chin({
-      put,
-      out,
-      ignored,
-      verbose: true,
-      processors: { json }
-    })
-  )
-  .then(() =>
-    outputFile(
-      process.env.CHIN_OUT + '/sitemap.xml',
-      json.sitemap()
-    )
-  )
-}
-
-const flow = async () => {
-  const rootConfig = requireRootConfig()
-  const favicons = await buildFavicons(rootConfig)
-  return buildPages(rootConfig, favicons)
-}
-
+program.args.length === 0
+  ? action(program)
+  : program.args[0].constructor !== program.Command && program.help()

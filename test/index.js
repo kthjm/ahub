@@ -1,38 +1,45 @@
 import assert from 'assert'
 import mock from 'mock-fs'
-// import { join, format } from 'path'
-// import { Transform } from 'stream'
-// import { chin, watch } from './src'
-
-const { assign } = Object
+import { join, format } from 'path'
 
 const put = 'dir/put'
 const out = 'dir/out'
+
+const node_modules = mock.symlink({ path: 'node_modules' })
+
+const indexJson = {
+  hostname: '',
+  meta: {},
+  who: {},
+  links: []
+}
+
+const name1Json = {
+  
+}
+
+const name2Json = {
+  
+}
+
 const tree = {
-  'node_modules': mock.symlink({ path: 'node_modules' }),
+  node_modules,
   [put]: {
-    '1.txt': 'contents',
-    'dir1': {
-      '1.txt': 'contents',
-      '2.txt': 'contents',
-      '3.txt': 'contents',
-      '4.txt': 'contents'
-    },
-    'dir2': {
-      '1.txt': 'contents',
-      '2.txt': 'contents',
-      '3.txt': 'contents',
-      '4.txt': 'contents'
-    }
+    'index.json': JSON.stringify(indexJson),
+    'name1.json': JSON.stringify(name1Json),
+    'name2.json': JSON.stringify(name2Json)
   }
 }
 
-// beforeEach(() => mock(tree))
-// afterEach(() => mock.restore())
+beforeEach(() => mock(tree))
+afterEach(() => mock.restore())
 
-describe('', () => {
+describe('action', () => {
+  
+  const action = require('../src/action.js').default
+  
   it('', () => {
-    const template = require('../src/template.js').default
-    console.log(template())
+    console.log(tree)
+    return action({ put }).catch(console.error)
   })
 })
