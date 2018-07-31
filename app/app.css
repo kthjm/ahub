@@ -1,24 +1,7 @@
 #who {
   text-align: center;
   margin-bottom: 80px;
-  /*display: flex;*/
-}
-#who_flex {
-  /*width: 100%;*/
-  /*padding: 0px 40px;*/
-  /*text-align: center;*/
-  /*position: relative;*/
-}
-#who_flex div {
-  /*display: inline-block;*/
-  
-}
-#avatar_wrap {
-  
-}
-#info_wrap {
-  /*position: absolute;*/
-  /*top: 0;*/
+/*display: flex*/
 }
 #avatar {
   width: 120px;
@@ -27,23 +10,22 @@
   object-position: center;
   border-radius: 100%;
 }
-
 #links {
   max-width: 900px;
   margin: auto;
   padding: 0px 60px;
-  /*display: flex;*/
+/*display: flex*/
 }
 .link {
   display: inline-block;
   position: relative;
   margin: 4px;
   border: solid #dedede 2px;
-  /*width: 300px;*/
-  /*height: 300px;*/
+/*width: 300px*/
+/*height: 300px*/
 }
 .link_icon {
-  /*display: inline-block;*/
+/*display: inline-block*/
   width: 380px;
   height: 380px;
   margin: 10px 20px;

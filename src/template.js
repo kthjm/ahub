@@ -1,27 +1,26 @@
-export default ({ heads } = {}) => `
+export default (lang = '', headOpts) => `
 <!DOCTYPE html>
-<html>
-  ${head(heads)}
+${!lang ? `<html>` : `<html lang="${lang}" >`}
+  ${head(headOpts)}
   ${body}
-</html>`
+</html>
+`
 
-const head = (heads = '') => `
-<head>
-  <title></title>
-  ${heads}
-  <!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>-->
+// <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script> -->
+const head = ({ prefix, title, headTags }) => `
+${!prefix ? `<head>` : `<head prefix="${prefix}" >`}
+  ${!title ? '' : `<title>${title}</title>`}
+  ${headTags || ''}
   <script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script defer src="/app.js"></script>
-  <script>
-  window.addEventListener('DOMContentLoaded', () => window.mount(window.location))
-  </script>
   <link rel="stylesheet" type="text/css" href="/app.css">
-</head>`
+</head>
+`
 
 const body = `
 <body>
   <div id="mounted">
-  
+
     <div id="who">
       <div id="who_flex">
         <div id="avatar_wrap">
@@ -33,7 +32,7 @@ const body = `
         </div>
       </div>
     </div>
-    
+
     <div id="links">
       <div v-for="link in links" class="link">
         <div>
@@ -45,6 +44,7 @@ const body = `
         </div>
       </div>
     </div>
-    
+
   </div>
-</body>`
+</body>
+`

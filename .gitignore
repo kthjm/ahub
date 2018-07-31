@@ -1,3 +1,7 @@
+# app/
+# dist/
+example.out/
+
 # Logs
 logs
 *.log

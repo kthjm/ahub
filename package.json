@@ -4,8 +4,8 @@
   "repository": "kthjm/hrehub",
   "author": "kthjm <toxictoxer@gmail.com>",
   "license": "MIT",
-  "main": "",
-  "bin": "",
+  "main": "dist/index.js",
+  "bin": "hrehub.js",
   "description": "",
   "keywords": [],
   "nyc": {
@@ -16,17 +16,19 @@
     "instrument": false
   },
   "scripts": {
-    "ex:build": "chin -c .example/chin.config.js",
-    "ex:serve": "serve .example/public",
-    "ex": "run-s ex:build ex:serve",
-    "test": "cross-env BABEL_ENV=TEST nyc mocha",
-    "build": "cross-env BABEL_ENV=BUILD rollup -c"
+    "example": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts example.js",
+    "serve": "serve example.out",
+    "build:bundle": "cross-env BABEL_ENV=BUILD rollup -c",
+    "build:chin": "chin -c",
+    "build": "run-s build:bundle build:chin"
   },
   "dependencies": {
-    "app-root-path": "^2.1.0",
     "chin": "^3.1.1",
     "commander": "^2.16.0",
+    "favicons": "^5.1.1",
     "fs-extra": "^7.0.0",
+    "html-tag": "^2.0.0",
+    "pretty": "^2.0.0",
     "sitemap": "^1.13.0"
   },
   "devDependencies": {
@@ -49,6 +51,7 @@
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-prettier": "^0.4.0",
-    "serve": "^9.4.0"
+    "serve": "^9.4.0",
+    "stylus": "^0.54.5"
   }
 }

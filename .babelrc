@@ -2,7 +2,7 @@
   "env": {
     "TEST": {
        "presets": [
-         ["env", { "targets": { "node": "current" } }],
+         "env",
          "power-assert"
        ],
        "plugins": [

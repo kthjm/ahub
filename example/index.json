@@ -1,0 +1,24 @@
+{
+  "hostname": "https://hoge.com",
+  "lang": "ja",
+  "head": {
+    "title": "title",
+    "prefix": "og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#",
+    "favicons": {
+      "appName": "appName"
+    },
+    "meta": [
+      { "charSet": "utf8" },
+      { "name": "keywords", "content": "hoge,fuga" },
+      { "name": "description", "content": "description" }
+    ]
+  },
+  "who": {
+    "name": "",
+    "avatar": "",
+    "description": ""
+  },
+  "links": [
+    {}
+  ]
+}

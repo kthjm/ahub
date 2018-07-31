@@ -1,10 +1,12 @@
 const isMobile = navigator.userAgent.toLowerCase().includes('mobile')
 
-const fetchConfig = ({ pathname }) =>
-  fetch(`${pathname === '/' ? '' : pathname}/index.json`)
-  .then(res => res.json())
+const fetchConfig = () => {
+  const { pathname } = location
+  const configPath = `${pathname === '/' ? '' : pathname}/index.json`
+  return fetch(configPath).then(res => res.json())
+}
 
-window.mount = (location) => new Vue({
+new Vue({
   el: '#mounted',
   data: {
     name: undefined,
@@ -15,7 +17,7 @@ window.mount = (location) => new Vue({
   watch: {},
   methods: {},
   created() {
-    return fetchConfig(location).then(config => {
+    return fetchConfig().then(config => {
       const { who: { name, avatar, description } = {}, links = [] } = config
       this.name = name
       this.avatar = avatar
