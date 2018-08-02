@@ -1,32 +1,51 @@
-import * as chin from 'chin'
-import { readJson, outputFile } from 'fs-extra'
+import chin from 'chin'
+import { outputFile } from 'fs-extra'
 import { join as pathJoin, resolve as pathResolve, sep as pathSep } from 'path'
-import buildFavicons from './favicons.js'
-import plugin from './plugin.js'
+import buildFavicons from './buildFavicons.js'
+import buildPages from './buildPages.js'
 import { asserts } from './util.js'
 
-const cwd = process.cwd()
+/*
+const isChildDir = (source) =>
+  pathResolve(source).split(pathSep).length > process.cwd().split(pathSep).length
+
+asserts(isChildDir(source), `${source} is invalid source`)
+*/
+
+const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
+  Promise.all([
+    ['sitemap.xml', sitemapXml],
+    ['robots.txt', robotsTxt]
+  ].map(([ filename, string ]) =>
+    outputFile(pathJoin(dest, filename), string)
+  ))
+
+const buildApps = (dest, verbose) =>
+  chin({
+    put: pathJoin(__dirname, '../app.dist'),
+    out: dest,
+    verbose
+  })
 
 const tuft = (
-  put,
-  out,
+  source,
+  dest,
   { favicons, lang, hostname, head, watch, ignored, verbose } = {}
 ) =>
   Promise.resolve()
   .then(() => {
-    asserts(put, `${put} is invalid source`)
-    asserts(pathResolve(put).split(pathSep).length > process.cwd().split(pathSep).length, `${put} is invalid source`)
-    asserts(out, `${out} is invalid dest`)
+    asserts(source, `${source} is invalid source`)
+    asserts(dest, `${dest} is invalid dest`)
   })
   .then(() =>
     favicons
-    ? buildFavicons(put, out, favicons)
+    ? buildFavicons(source, dest, favicons)
     : ''
   )
   .then(faviconsHtml =>
     buildPages(
-      put,
-      out,
+      source,
+      dest,
       verbose,
       ignored,
       watch,
@@ -35,52 +54,10 @@ const tuft = (
   )
   .then(results =>
     results &&
-    buildSitemap(out, results)
+    buildSitemap(dest, results)
   )
   .then(() =>
-    buildApps(out, verbose)
+    buildApps(dest, verbose)
   )
-
-const buildPages = (put, out, verbose, ignored, watch, options) => {
-
-  const json = plugin(options)
-  
-  const build = watch ? chin.watch : chin.chin
-
-  ignored = [
-    'node_modules/**',
-    'favicons.*'
-  ].concat(
-    Array.isArray(ignored) ? ignored : []
-  )
-
-  watch = Object.assign({}, { ignored, ignoreInitial: true }, watch)
-
-  return build({
-    put,
-    out,
-    verbose,
-    watch,
-    ignored,
-    processors: { json }
-  })
-  .then(watcher => {})
-  .then(() => json.after())
-}
-
-const buildSitemap = (out, { sitemapXml, robotsTxt }) =>
-  Promise.all([
-    ['sitemap.xml', sitemapXml],
-    ['robots.txt', robotsTxt]
-  ].map(([ filename, string ]) =>
-    outputFile(pathJoin(out, filename), string)
-  ))
-
-const buildApps = (out, verbose) =>
-  chin.chin({
-    put: pathJoin(__dirname, '../app.dist'),
-    out,
-    verbose
-  })
 
 export default tuft

@@ -12,6 +12,7 @@ var pretty = _interopDefault(require('pretty'))
 var createTag = _interopDefault(require('html-tag'))
 var url = require('url')
 var chin = require('chin')
+var chin__default = _interopDefault(chin)
 
 const favname = 'favicons'
 
@@ -198,76 +199,88 @@ var plugin = ({ hostname, lang, head: rootHead = {}, faviconsHtml = '' }) => {
   return { isStream, options, after, processor }
 }
 
+const defaultIgnored = [
+  'node_modules**',
+  '.gitignore',
+  'README.md',
+  'LICENSE',
+  'favicons.*',
+  'package.json',
+  'yarn.lock',
+  'yarn-error.log'
+]
+
+const isBelong = (child, parent) =>
+  path
+    .relative(child, parent)
+    .split(path.sep)
+    .every(splited => splited === '..')
+
+var buildPages = (put, out, verbose, ignored, watch, options) => {
+  const json = plugin(options)
+
+  const build = watch ? chin.watch : chin.chin
+
+  ignored = [].concat(
+    defaultIgnored,
+    isBelong(out, put) ? [out] : [],
+    Array.isArray(ignored) ? ignored : []
+  )
+
+  watch = Object.assign({}, { ignored, ignoreInitial: true }, watch)
+
+  return build({ put, out, verbose, watch, ignored, processors: { json } })
+    .then(watcher => {})
+    .then(() => json.after())
+}
+
 const throws = message => {
   throw new Error(message)
 }
 const asserts = (condition, message) => !condition && throws(message)
 
-const cwd = process.cwd()
+/*
+const isChildDir = (source) =>
+  pathResolve(source).split(pathSep).length > process.cwd().split(pathSep).length
+
+asserts(isChildDir(source), `${source} is invalid source`)
+*/
+
+const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
+  Promise.all(
+    [['sitemap.xml', sitemapXml], ['robots.txt', robotsTxt]].map(
+      ([filename, string]) =>
+        fsExtra.outputFile(path.join(dest, filename), string)
+    )
+  )
+
+const buildApps = (dest, verbose) =>
+  chin__default({
+    put: path.join(__dirname, '../app.dist'),
+    out: dest,
+    verbose
+  })
 
 const tuft = (
-  put,
-  out,
+  source,
+  dest,
   { favicons: favicons$$1, lang, hostname, head, watch, ignored, verbose } = {}
 ) =>
   Promise.resolve()
     .then(() => {
-      asserts(put, `${put} is invalid source`)
-      asserts(
-        path.resolve(put).split(path.sep).length >
-          process.cwd().split(path.sep).length,
-        `${put} is invalid source`
-      )
-      asserts(out, `${out} is invalid dest`)
+      asserts(source, `${source} is invalid source`)
+      asserts(dest, `${dest} is invalid dest`)
     })
-    .then(() => (favicons$$1 ? buildFavicons(put, out, favicons$$1) : ''))
+    .then(() => (favicons$$1 ? buildFavicons(source, dest, favicons$$1) : ''))
     .then(faviconsHtml =>
-      buildPages(put, out, verbose, ignored, watch, {
+      buildPages(source, dest, verbose, ignored, watch, {
         hostname,
         lang,
         head,
         faviconsHtml
       })
     )
-    .then(results => results && buildSitemap(out, results))
-    .then(() => buildApps(out, verbose))
-
-const buildPages = (put, out, verbose, ignored, watch, options) => {
-  const json = plugin(options)
-
-  const build = watch ? chin.watch : chin.chin
-
-  ignored = ['node_modules/**', 'favicons.*'].concat(
-    Array.isArray(ignored) ? ignored : []
-  )
-
-  watch = Object.assign({}, { ignored, ignoreInitial: true }, watch)
-
-  return build({
-    put,
-    out,
-    verbose,
-    watch,
-    ignored,
-    processors: { json }
-  })
-    .then(watcher => {})
-    .then(() => json.after())
-}
-
-const buildSitemap = (out, { sitemapXml, robotsTxt }) =>
-  Promise.all(
-    [['sitemap.xml', sitemapXml], ['robots.txt', robotsTxt]].map(
-      ([filename, string]) =>
-        fsExtra.outputFile(path.join(out, filename), string)
-    )
-  )
-
-const buildApps = (out, verbose) =>
-  chin.chin({
-    put: path.join(__dirname, '../app.dist'),
-    out,
-    verbose
-  })
+    .then(results => results && buildSitemap(dest, results))
+    .then(() => buildApps(dest, verbose))
 
 module.exports = tuft
