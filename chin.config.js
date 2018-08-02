@@ -37,7 +37,7 @@ const configs = {
       tuft(
         '.put',
         '.out',
-        { watch: { ignoreInitial: true }, verbose: true }
+        { watch: true, verbose: true }
       ).then(() =>
         bs.create().init({ server: '.out', watch: true })
       )
