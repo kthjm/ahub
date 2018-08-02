@@ -6,7 +6,7 @@
 #avatar {
   width: 120px;
   height: 120px;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   border-radius: 100%;
 }

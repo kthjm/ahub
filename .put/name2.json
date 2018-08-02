@@ -1,0 +1,20 @@
+{
+  "template": {
+    "sep": true,
+    "lang": "ja",
+    "title": "name2",
+    "ga": "",
+    "tags": []
+  },
+  "data": {
+    "name": "",
+    "avatar": "",
+    "description": "",
+    "links": [
+      {
+        "href": "",
+        "src": ""
+      }
+    ]
+  }
+}

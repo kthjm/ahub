@@ -1,29 +1,50 @@
-const stylus = require('stylus')
-const babel = require('babel-core')
+const { render: stylusRender } = require('stylus')
+const { transform: babelTransform } = require('babel-core')
 const { format } = require('path')
+const bs = require('browser-sync')
+const tuft = require('.')
 
-const js2babel = (options) => ({
-  isStream: false,
-  options: { encoding: 'utf8' },
-  processor: (code) =>
-    babel.transform(code, options).code
-})
-
-const styl2css = (options) => ({
+const stylus = (options) => ({
   isStream: false,
   options: { encoding: 'utf8' },
   processor: (code, { out }) => [
     format(Object.assign({}, out, { ext: '.css' })),
-    stylus.render(code, options)
+    stylusRender(code, options)
   ]
 })
 
-module.exports = {
-  put: 'src/browser',
-  out: 'app',
-  clean: true,
-  processors: {
-    js: js2babel({ babelrc: false, presets: ['env'] }),
-    styl: styl2css({})
+const babel = (options) => ({
+  isStream: false,
+  options: { encoding: 'utf8' },
+  processor: (code) =>
+    babelTransform(code, options).code
+})
+
+const put = 'app.src'
+const processors = {
+  styl: stylus({}),
+  js: babel({ babelrc: false, presets: ['env'] })
+}
+
+const configs = {
+  'start': {
+    put,
+    processors,
+    out: '.out',
+    clean: true,
+    watch: {},
+    after: () =>
+      tuft('.put', '.out', { watch: true, light: true, verbose: true }).then(() =>
+        bs.create().init({ server: '.out', watch: true })
+      )
+  },
+  'build:chin': {
+    put,
+    processors,
+    out: 'app.dist',
+    clean: true
   }
 }
+
+const { npm_lifecycle_event: command } = process.env
+module.exports = configs[command]

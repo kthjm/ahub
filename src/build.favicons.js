@@ -11,7 +11,7 @@ const files = [
   'jpeg'
 ].map(ext => `${favname}.${ext}`)
 
-export default (put, out, { head: { favicons: config } = {} }) =>
+export default (put, out, config) =>
   Promise.all(
     files
     .map(file => pathJoin(put, file))
@@ -24,20 +24,18 @@ export default (put, out, { head: { favicons: config } = {} }) =>
   .then(source =>
     !source
     ? ''
-    : (
-      favicons(source, Object.assign({}, config, { path: `/${favname}` }))
-      .then(({ html, images, files }) =>
-        Promise
-        .all(
-          []
-          .concat(images, files)
-          .map(({ name, contents }) =>
-            outputFile(pathJoin(out, favname, name), contents)
-          )
+    : favicons(source, Object.assign({}, config, { path: `/${favname}` }))
+    .then(({ html, images, files }) =>
+      Promise
+      .all(
+        []
+        .concat(images, files)
+        .map(({ name, contents }) =>
+          outputFile(pathJoin(out, `/${favname}/${name}`), contents)
         )
-        .then(() =>
-          html.join('')
-        )
+      )
+      .then(() =>
+        html.join('')
       )
     )
   )

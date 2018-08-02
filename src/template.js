@@ -7,13 +7,14 @@ ${!lang ? `<html>` : `<html lang="${lang}" >`}
 `
 
 // <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script> -->
-const head = ({ prefix, title, headTags }) => `
+const head = ({ prefix, title, ga, headHtml }) => `
 ${!prefix ? `<head>` : `<head prefix="${prefix}" >`}
   ${!title ? '' : `<title>${title}</title>`}
-  ${headTags || ''}
+  ${headHtml || ''}
   <script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script defer src="/app.js"></script>
   <link rel="stylesheet" type="text/css" href="/app.css">
+  ${!ga ? '' : `<script></script>`}
 </head>
 `
 

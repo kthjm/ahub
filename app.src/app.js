@@ -2,7 +2,7 @@ const isMobile = navigator.userAgent.toLowerCase().includes('mobile')
 
 const fetchConfig = () => {
   const { pathname } = location
-  const configPath = `${pathname === '/' ? '' : pathname}/index.json`
+  const configPath = `${pathname}index.json`
   return fetch(configPath).then(res => res.json())
 }
 
@@ -17,8 +17,8 @@ new Vue({
   watch: {},
   methods: {},
   created() {
-    return fetchConfig().then(config => {
-      const { who: { name, avatar, description } = {}, links = [] } = config
+    return fetchConfig()
+    .then(({ name, avatar, description, links = [] }) => {
       this.name = name
       this.avatar = avatar
       this.description = description

@@ -1,6 +1,6 @@
 # app/
 # dist/
-example.out/
+.out/
 
 # Logs
 logs

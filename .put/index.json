@@ -1,0 +1,32 @@
+{
+  "hostname": "https://hoge.com",
+  "watch": {
+    "ignoreInitial": true
+  },
+  "favicons": {
+    "appName": "appName",
+    "appDescription": "appDescription"
+  },
+  "template": {
+    "lang": "ja",
+    "title": "title2",
+    "prefix": "og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#",
+    "ga": "",
+    "tags": [
+      ["meta", { "charSet": "utf8" }],
+      ["meta", { "name": "keywords", "content": "hoge,fuga" }],
+      ["meta", { "name": "description", "content": "description" }]
+    ]
+  },
+  "data": {
+    "avatar": "",
+    "name": "kthjm",
+    "description": "koto hajime",
+    "links": [
+      {
+        "href": "",
+        "src": ""
+      }
+    ]
+  }
+}

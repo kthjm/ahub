@@ -1,11 +1,11 @@
 {
-  "name": "hrehub",
-  "version": "0.0.1",
-  "repository": "kthjm/hrehub",
+  "name": "tuft",
+  "version": "0.0.0",
+  "repository": "kthjm/tuft",
   "author": "kthjm <toxictoxer@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
-  "bin": "hrehub.js",
+  "bin": "tuft.js",
   "description": "",
   "keywords": [],
   "nyc": {
@@ -16,11 +16,11 @@
     "instrument": false
   },
   "scripts": {
-    "example": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts example.js",
-    "serve": "serve example.out",
-    "build:bundle": "cross-env BABEL_ENV=BUILD rollup -c",
+    "test": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts",
+    "start": "chin watch -c",
+    "build:roll": "cross-env BABEL_ENV=BUILD rollup -c",
     "build:chin": "chin -c",
-    "build": "run-s build:bundle build:chin"
+    "build": "run-s build:roll build:chin"
   },
   "dependencies": {
     "chin": "^3.1.1",
@@ -39,6 +39,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-power-assert": "^2.0.0",
+    "browser-sync": "^2.24.6",
     "codecov": "^3.0.4",
     "cross-env": "^5.2.0",
     "mocha": "^5.2.0",

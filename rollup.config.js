@@ -4,7 +4,7 @@ import autoExternal from 'rollup-plugin-auto-external'
 import prettier from 'rollup-plugin-prettier'
 
 export default {
-  input: 'src/hrehub.js',
+  input: 'src/tuft.js',
   output: { format: 'cjs', file: 'dist/index.js' },
   plugins: [
     // flow({ pretty: true }),
