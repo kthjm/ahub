@@ -1160,9 +1160,9 @@ cheerio@^0.19.0:
     htmlparser2 "~3.8.1"
     lodash "^3.2.0"
 
-chin@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/chin/-/chin-3.1.1.tgz#d903ccf4544b3a3335b99e619a4fa20bffaa17e1"
+"chin@https://github.com/chinjs/chin#3.1.2":
+  version "3.1.2"
+  resolved "https://github.com/chinjs/chin#fa0bf21af2c15888949f6b36fc3681052fbd615e"
   dependencies:
     app-root-path "^2.0.1"
     chalk "^2.4.1"
