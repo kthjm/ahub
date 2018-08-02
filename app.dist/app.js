@@ -37,5 +37,7 @@ new Vue({
       _this.description = description;
       _this.links = links;
     });
-  }
+  },
+
+  template: '\n  <div>\n    <div id="who">\n      <div id="who_flex">\n        <div id="avatar_wrap">\n          <img id="avatar" :src="avatar" />\n        </div>\n        <div id="info_wrap">\n          <h2>{{ name }}</h2>\n          <p>{{ description }}</p>\n        </div>\n      </div>\n    </div>\n    <div id="links">\n      <div v-for="link in links" class="link">\n        <div>\n          <a :href="link.href" target="_blank">\n            <img :src="link.icon" class="link_icon" />\n          </a>\n        </div>\n        <div class="link_foot">\n        </div>\n      </div>\n    </div>\n  </div>\n  '
 });

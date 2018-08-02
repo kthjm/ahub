@@ -7,12 +7,11 @@ function _interopDefault(ex) {
 var favicons = _interopDefault(require('favicons'))
 var fsExtra = require('fs-extra')
 var path = require('path')
-var chin = require('chin')
-var chin__default = _interopDefault(chin)
 var sitemap = require('sitemap')
 var pretty = _interopDefault(require('pretty'))
 var createTag = _interopDefault(require('html-tag'))
 var url = require('url')
+var chin = require('chin')
 
 const favname = 'favicons'
 
@@ -48,17 +47,21 @@ var buildFavicons = (put, out, config) =>
             )
     )
 
-var template = (lang = '', headOpts) => `
+var template = (lang, headOpts) => `
 <!DOCTYPE html>
-${!lang ? `<html>` : `<html lang="${lang}" >`}
+<html${!lang ? '' : ` lang="${lang}" `}>
   ${head(headOpts)}
-  ${body}
+  <body>
+    <div id="mounted"></div>
+  </body>
 </html>
 `
 
-// <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script> -->
-const head = ({ prefix, title, ga, headHtml }) => `
-${!prefix ? `<head>` : `<head prefix="${prefix}" >`}
+const ogPrefix =
+  'og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#'
+
+const head = ({ title, og, ga, headHtml }) => `
+${!og ? `<head>` : `<head prefix="${ogPrefix}" >`}
   ${!title ? '' : `<title>${title}</title>`}
   ${headHtml || ''}
   <script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -67,6 +70,7 @@ ${!prefix ? `<head>` : `<head prefix="${prefix}" >`}
   ${!ga ? '' : `<script></script>`}
 </head>
 `
+/*
 
 const body = `
 <body>
@@ -99,11 +103,11 @@ const body = `
   </div>
 </body>
 `
+*/
 
 const isStream = false
 const options = { encoding: 'utf8' }
 const { assign } = Object
-const { isArray } = Array
 
 const sortUrls = urls =>
   []
@@ -114,25 +118,21 @@ const createRobotsTxt = hostname => `User-agent: *
 Sitemap: ${url.resolve(hostname, 'sitemap.xml')}`
 
 const tags2html = tags =>
-  !isArray(tags)
+  !Array.isArray(tags)
     ? ''
     : tags
-        .filter(isArray)
+        .filter(Array.isArray)
         .map(arg => createTag(...arg))
         .join('')
 
-const createSitemapImg = ({ avatar, links }) =>
+const createSitemapImg = ({ avatar, links = [] }) =>
   []
     .concat([avatar], links.map(({ icon } = {}) => icon))
     .filter(url$$1 => url$$1 && !url$$1.includes('http'))
     .map(url$$1 => ({ url: url$$1 }))
 
-const plugin = ({
-  hostname,
-  template: rootTemplate = {},
-  faviconsHtml = ''
-}) => {
-  const rootTagsHtml = tags2html(rootTemplate.tags)
+var plugin = ({ hostname, lang, head: rootHead = {}, faviconsHtml = '' }) => {
+  const rootTagsHtml = tags2html(rootHead.tags)
 
   let _urls = []
   const after = () => {
@@ -154,65 +154,48 @@ const plugin = ({
         ? out
         : assign({}, out, { name: 'index', dir: path.join(out.dir, out.name) })
 
-    const {
-      data,
-      template: { sep, lang, title, prefix, ga, tags } = {}
-    } = JSON.parse(jsonstring)
+    let json
+    try {
+      json = JSON.parse(jsonstring)
+    } catch (e) {
+      json = {}
+    }
 
-    if (hostname && isArray(_urls)) {
+    const { body = {}, head: { sep, title, og, ga, tags } = {} } = json
+
+    if (hostname && Array.isArray(_urls)) {
       const url$$1 = url.resolve(
         '',
         out.dir.split(process.env.CHIN_OUT)[1] || '/'
       )
-      const img = createSitemapImg(data)
+      const img = createSitemapImg(body)
       _urls.push({ url: url$$1, img })
     }
 
-    const templateArg = sep
-      ? [
-          lang,
-          {
-            title,
-            prefix,
-            ga,
-            headHtml: tags2html(tags) + faviconsHtml
-          }
-        ]
-      : [
-          lang || rootTemplate.lang,
-          {
-            title: title || rootTemplate.title,
-            prefix: prefix || rootTemplate.prefix,
-            ga: ga || rootTemplate.ga,
-            headHtml: (tags2html(tags) || rootTagsHtml) + faviconsHtml
-          }
-        ]
+    const headOpts = sep
+      ? {
+          title,
+          og,
+          ga,
+          headHtml: tags2html(tags) + faviconsHtml
+        }
+      : {
+          title: title || rootHead.title,
+          og: og || rootHead.og,
+          ga: ga || rootHead.ga,
+          headHtml: (tags2html(tags) || rootTagsHtml) + faviconsHtml
+        }
 
     return [
-      [path.format(out), JSON.stringify(data, null, '\t')],
+      [path.format(out), JSON.stringify(body, null, '\t')],
       [
         path.format(assign({}, out, { ext: '.html' })),
-        pretty(template(...templateArg), { ocd: true })
+        pretty(template(lang, headOpts), { ocd: true })
       ]
     ]
   }
 
   return { isStream, options, after, processor }
-}
-
-var buildPages = (put, out, verbose, watch, options) => {
-  const json = plugin(options)
-  const build = typeof watch === 'object' ? chin.watch : chin.chin
-  return build({
-    put,
-    out,
-    verbose,
-    watch,
-    processors: { json },
-    ignored: ['favicons.*']
-  })
-    .then(watcher => {})
-    .then(() => json.after())
 }
 
 const throws = message => {
@@ -222,37 +205,55 @@ const asserts = (condition, message) => !condition && throws(message)
 
 const cwd = process.cwd()
 
-const requireIndexJson = (put = '') =>
-  fsExtra.readJson(path.join(put, 'index.json'))
-// readJson(pathJoin(cwd, put, 'index.json'))
-
-var tuft = (put, out, { light, verbose, watch: isWatch } = {}) =>
+const tuft = (
+  put,
+  out,
+  { favicons: favicons$$1, lang, hostname, head, watch, ignored, verbose } = {}
+) =>
   Promise.resolve()
-    .then(() =>
+    .then(() => {
+      asserts(put, `${put} is invalid source`)
       asserts(
-        path.resolve(put).split(path.sep).length > cwd.split(path.sep).length,
-        `${put} is invalid src.`
+        path.resolve(put).split(path.sep).length >
+          process.cwd().split(path.sep).length,
+        `${put} is invalid source`
       )
+      asserts(out, `${out} is invalid dest`)
+    })
+    .then(() => (favicons$$1 ? buildFavicons(put, out, favicons$$1) : ''))
+    .then(faviconsHtml =>
+      buildPages(put, out, verbose, ignored, watch, {
+        hostname,
+        lang,
+        head,
+        faviconsHtml
+      })
     )
-    .then(() => requireIndexJson(put))
-    .then(({ hostname, watch, favicons: favicons$$1, template }) =>
-      Promise.resolve()
-        .then(
-          () =>
-            !light && typeof favicons$$1 === 'object'
-              ? buildFavicons(put, out, favicons$$1)
-              : ''
-        )
-        .then(faviconsHtml =>
-          buildPages(put, out, verbose, isWatch && (watch || {}), {
-            hostname,
-            template,
-            faviconsHtml
-          })
-        )
-        .then(results => !light && results && buildSitemap(out, results))
-        .then(() => buildApps(out, verbose))
-    )
+    .then(results => results && buildSitemap(out, results))
+    .then(() => buildApps(out, verbose))
+
+const buildPages = (put, out, verbose, ignored, watch, options) => {
+  const json = plugin(options)
+
+  const build = watch ? chin.watch : chin.chin
+
+  ignored = ['node_modules/**', 'favicons.*'].concat(
+    Array.isArray(ignored) ? ignored : []
+  )
+
+  watch = Object.assign({}, { ignored, ignoreInitial: true }, watch)
+
+  return build({
+    put,
+    out,
+    verbose,
+    watch,
+    ignored,
+    processors: { json }
+  })
+    .then(watcher => {})
+    .then(() => json.after())
+}
 
 const buildSitemap = (out, { sitemapXml, robotsTxt }) =>
   Promise.all(
@@ -263,7 +264,7 @@ const buildSitemap = (out, { sitemapXml, robotsTxt }) =>
   )
 
 const buildApps = (out, verbose) =>
-  chin__default({
+  chin.chin({
     put: path.join(__dirname, '../app.dist'),
     out,
     verbose

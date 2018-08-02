@@ -1,4 +1,3 @@
-import * as chin from 'chin'
 import { createSitemap } from 'sitemap'
 import pretty from 'pretty'
 import createTag from 'html-tag'
@@ -9,7 +8,6 @@ import template from './template.js'
 const isStream = false
 const options = { encoding: 'utf8' }
 const { assign } = Object
-const { isArray } = Array
 
 const sortUrls = (urls) =>
   []
@@ -25,11 +23,11 @@ const createRobotsTxt = (hostname) =>
 Sitemap: ${urlResolve(hostname, 'sitemap.xml')}`
 
 const tags2html = (tags) =>
-  !isArray(tags)
+  !Array.isArray(tags)
   ? ''
-  : tags.filter(isArray).map(arg => createTag(...arg)).join('')
+  : tags.filter(Array.isArray).map(arg => createTag(...arg)).join('')
 
-const createSitemapImg = ({ avatar, links }) =>
+const createSitemapImg = ({ avatar, links = [] }) =>
   []
   .concat(
     [avatar],
@@ -38,9 +36,14 @@ const createSitemapImg = ({ avatar, links }) =>
   .filter(url => url && !url.includes('http'))
   .map(url => ({ url }))
 
-const plugin = ({ hostname, template: rootTemplate = {}, faviconsHtml = '' }) => {
+export default ({
+  hostname,
+  lang,
+  head: rootHead = {},
+  faviconsHtml = ''
+}) => {
 
-  const rootTagsHtml = tags2html(rootTemplate.tags)
+  const rootTagsHtml = tags2html(rootHead.tags)
 
   let _urls = []
   const after = () => {
@@ -58,54 +61,46 @@ const plugin = ({ hostname, template: rootTemplate = {}, faviconsHtml = '' }) =>
     ? out
     : assign({}, out, { name: 'index', dir: pathJoin(out.dir, out.name) })
 
-    const { data, template: { sep, lang, title, prefix, ga, tags } = {} } = JSON.parse(jsonstring)
+    let json
+    try { json = JSON.parse(jsonstring) }
+    catch(e) { json = {} }
 
-    if (hostname && isArray(_urls)) {
+    const {
+      body = {},
+      head: { sep, title, og, ga, tags } = {}
+    } = json
+
+    if (hostname && Array.isArray(_urls)) {
       const url = urlResolve('', out.dir.split(process.env.CHIN_OUT)[1] || '/')
-      const img = createSitemapImg(data)
+      const img = createSitemapImg(body)
       _urls.push({ url, img })
     }
 
-    const templateArg = sep
-    ? [lang, {
+    const headOpts = sep
+    ? {
       title,
-      prefix,
+      og,
       ga,
       headHtml: tags2html(tags) + faviconsHtml
-    }]
-    : [lang || rootTemplate.lang, {
-      title: title || rootTemplate.title,
-      prefix: prefix || rootTemplate.prefix,
-      ga: ga || rootTemplate.ga,
+    }
+    : {
+      title: title || rootHead.title,
+      og: og || rootHead.og,
+      ga: ga || rootHead.ga,
       headHtml: (tags2html(tags) || rootTagsHtml) + faviconsHtml
-    }]
+    }
 
     return [
       [
         pathFormat(out),
-        JSON.stringify(data, null, '\t')
+        JSON.stringify(body, null, '\t')
       ],
       [
         pathFormat(assign({}, out, { ext: '.html' })),
-        pretty(template(...templateArg), { ocd: true })
+        pretty(template(lang, headOpts), { ocd: true })
       ]
     ]
   }
 
   return { isStream, options, after, processor }
-}
-
-export default (put, out, verbose, watch, options) => {
-  const json = plugin(options)
-  const build = typeof watch === 'object' ? chin.watch : chin.chin
-  return build({
-    put,
-    out,
-    verbose,
-    watch,
-    processors: { json },
-    ignored: ['favicons.*']
-  })
-  .then(watcher => {})
-  .then(() => json.after())
 }

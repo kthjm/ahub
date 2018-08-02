@@ -5,7 +5,7 @@
   "author": "kthjm <toxictoxer@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
-  "bin": "tuft.js",
+  "bin": "bin/tuft.js",
   "description": "",
   "keywords": [],
   "nyc": {
@@ -15,7 +15,23 @@
     "sourceMap": false,
     "instrument": false
   },
+  "tuft": {
+    "source": ".put",
+    "dest": ".out",
+    "hostname": "https://hoge.com",
+    "lang": "ja",
+    "watch": {
+      "ignoreInitial": true
+    },
+    "favicons": {
+      "appName": "appName",
+      "appDescription": "appDescription"
+    },
+    "ignored": []
+  },
   "scripts": {
+    "tuft": "cross-env BABEL_ENV=BIN node -r babel-register src/bin.index.js",
+    "tuft:bin": "node bin/tuft.js",
     "test": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts",
     "start": "chin watch -c",
     "build:roll": "cross-env BABEL_ENV=BUILD rollup -c",

@@ -1,5 +1,6 @@
 # app/
 # dist/
+# bin/
 .out/
 
 # Logs

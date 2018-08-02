@@ -1,14 +1,20 @@
-export default (lang = '', headOpts) => `
+
+export default (lang, headOpts) => `
 <!DOCTYPE html>
-${!lang ? `<html>` : `<html lang="${lang}" >`}
+<html${!lang ? '' : ` lang="${lang}" `}>
   ${head(headOpts)}
-  ${body}
+  <body>
+    <div id="mounted"></div>
+  </body>
 </html>
 `
 
-// <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script> -->
-const head = ({ prefix, title, ga, headHtml }) => `
-${!prefix ? `<head>` : `<head prefix="${prefix}" >`}
+{/* <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script> */}
+
+const ogPrefix = 'og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#'
+
+const head = ({ title, og, ga, headHtml }) => `
+${!og ? `<head>` : `<head prefix="${ogPrefix}" >`}
   ${!title ? '' : `<title>${title}</title>`}
   ${headHtml || ''}
   <script defer src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -17,6 +23,7 @@ ${!prefix ? `<head>` : `<head prefix="${prefix}" >`}
   ${!ga ? '' : `<script></script>`}
 </head>
 `
+/*
 
 const body = `
 <body>
@@ -49,3 +56,4 @@ const body = `
   </div>
 </body>
 `
+*/

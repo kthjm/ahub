@@ -1,23 +1,17 @@
 # tuft
 
-```shell
-yarn tuft <dir>
-```
-
+page:
 ```json
 {
-  "hostname": "https://~",
-  "favicons": {},
-  "template": {
-    "lang": "",
+  "head": {
     "title": "",
-    "prefix": "",
+    "og": "",
     "ga": "",
     "tags": [
       ["name", { "key": "value" }, "text"]
     ]
   },
-  "data": {
+  "body": {
     "name": "",
     "avatar": "",
     "description": "",
@@ -30,4 +24,28 @@ yarn tuft <dir>
     ]
   }
 }
+```
+config:
+```json
+{
+  "source": ".put",
+  "dest": ".out",
+  "hostname": "http~",
+  "lang": "",
+  "ignored": [],
+  "favicons": {},
+  "watch": {}
+}
+```
+shell:
+```shell
+  Usage: tuft [source] [dest: '.site'] [options]
+
+  Options:
+
+    -c, --config <jsonfile>  default: 'tuft.json' || packagejson.tuft
+    -p, --product            build as production
+    -q, --quiet              without log
+    -v, --version            output the version number
+    -h, --help               output usage information
 ```

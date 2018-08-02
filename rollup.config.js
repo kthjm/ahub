@@ -3,20 +3,32 @@ import babel from 'rollup-plugin-babel'
 import autoExternal from 'rollup-plugin-auto-external'
 import prettier from 'rollup-plugin-prettier'
 
-export default {
-  input: 'src/tuft.js',
-  output: { format: 'cjs', file: 'dist/index.js' },
-  plugins: [
-    // flow({ pretty: true }),
-    babel({ exclude: 'node_modules/**' }),
-    autoExternal({
-      builtins: true,
-      dependencies: true
-    }),
-    prettier({
-      tabWidth: 2,
-      semi: false,
-      singleQuote: true
-    })
-  ]
-}
+const shebang = '#!/usr/bin/env node'
+
+const plugins = [
+  // flow({ pretty: true }),
+  babel({ exclude: 'node_modules/**' }),
+  autoExternal({
+    builtins: true,
+    dependencies: true
+  }),
+  prettier({
+    tabWidth: 2,
+    semi: false,
+    singleQuote: true
+  })
+]
+
+export default [
+  {
+    input: 'src/index.js',
+    output: { format: 'cjs', file: 'dist/index.js' },
+    plugins
+  },
+  {
+    input: 'src/bin.index.js',
+    output: { format: 'cjs', file: 'bin/tuft.js', banner: shebang },
+    external: ['..'],
+    plugins
+  }
+]

@@ -1,14 +1,13 @@
 {
-  "template": {
+  "head": {
     "sep": true,
-    "lang": "ja",
     "title": "name2",
     "ga": "",
     "tags": []
   },
-  "data": {
-    "name": "",
-    "avatar": "",
+  "body": {
+    "name": "name2",
+    "avatar": "https://avatars2.githubusercontent.com/u/40654512?s=280&v=4",
     "description": "",
     "links": [
       {

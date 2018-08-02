@@ -1,5 +1,10 @@
 {
   "env": {
+    "BIN": {
+      "presets": [
+        "env"
+      ]
+    },
     "TEST": {
        "presets": [
          "env",
@@ -10,8 +15,12 @@
        ]
     },
     "BUILD": {
-      "presets": [["env", { "targets": { "node": "8.11.3" }, "modules": false }]],
-      "plugins": ["external-helpers"]
+      "presets": [
+        ["env", { "targets": { "node": "8.11.3" }, "modules": false }]
+      ],
+      "plugins": [
+        "external-helpers"
+      ]
     }
   }
 }
