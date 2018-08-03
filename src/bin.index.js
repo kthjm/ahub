@@ -1,5 +1,6 @@
 import program from 'commander'
-import action, { SRC, DEST, CONFIG } from './bin.action.js'
+import action from './bin.action.js'
+import { SRC, DEST, CONFIG } from './util.js'
 
 program
 .arguments('[src] [dest]')

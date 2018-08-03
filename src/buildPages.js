@@ -1,8 +1,10 @@
 import * as chin from 'chin'
 import { relative as pathRelative, sep as pathSep } from 'path'
 import plugin from './plugin.js'
+import { CONFIG } from './util.js'
 
 const defaultIgnored = [
+  CONFIG,
   'node_modules**',
   '.git**',
   'README.md',
@@ -19,7 +21,7 @@ const isBelong = (child, parent) =>
   .every(splited => splited === '..')
 
 export default (put, out, verbose, ignored, watch, options) => {
-  
+
   ignored = [].concat(
     defaultIgnored,
     isBelong(out, put) ? [ out ] : [],

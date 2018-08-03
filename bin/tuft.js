@@ -10,13 +10,12 @@ var path = require('path')
 var tuft = _interopDefault(require('..'))
 var program = _interopDefault(require('commander'))
 
-const throws = message => {
-  throw new Error(message)
-}
-
 const SRC = '.'
 const DEST = '.site'
 const CONFIG = 'tuft.json'
+const throws = message => {
+  throw new Error(message)
+}
 
 const normalizeConfig = (src, dest, configPath, isPro, isWatch) =>
   Promise.resolve()

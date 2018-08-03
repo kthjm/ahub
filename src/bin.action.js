@@ -1,11 +1,7 @@
 import { readJson, remove } from 'fs-extra'
 import { join as pathJoin } from 'path'
-import { throws } from './util.js'
+import { throws, SRC, DEST, CONFIG } from './util.js'
 import tuft from '..'
-
-export const SRC = '.'
-export const DEST = '.site'
-export const CONFIG = 'tuft.json'
 
 const normalizeConfig = (src, dest, configPath, isPro, isWatch) =>
   Promise.resolve()

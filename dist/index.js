@@ -69,40 +69,6 @@ ${!og ? `<head>` : `<head prefix="${ogPrefix}" >`}
   ${!ga ? '' : `<script></script>`}
 </head>
 `
-/*
-
-const body = `
-<body>
-  <div id="mounted">
-
-    <div id="who">
-      <div id="who_flex">
-        <div id="avatar_wrap">
-          <img id="avatar" :src="avatar" />
-        </div>
-        <div id="info_wrap">
-          <h2>{{ name }}</h2>
-          <p>{{ description }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div id="links">
-      <div v-for="link in links" class="link">
-        <div>
-          <a :href="link.href" target="_blank">
-            <img :src="link.icon" class="link_icon" />
-          </a>
-        </div>
-        <div class="link_foot">
-        </div>
-      </div>
-    </div>
-
-  </div>
-</body>
-`
-*/
 
 const isStream = false
 const options = { encoding: 'utf8' }
@@ -200,7 +166,14 @@ var plugin = ({ hostname, lang, head: rootHead = {}, faviconsHtml = '' }) => {
   return { isStream, options, after, processor }
 }
 
+const CONFIG = 'tuft.json'
+const throws = message => {
+  throw new Error(message)
+}
+const asserts = (condition, message) => !condition && throws(message)
+
 const defaultIgnored = [
+  CONFIG,
   'node_modules**',
   '.git**',
   'README.md',
@@ -238,11 +211,6 @@ var buildPages = (put, out, verbose, ignored, watch, options) => {
         )
         .then(watcher => ({ watcher, after: json.after() }))
 }
-
-const throws = message => {
-  throw new Error(message)
-}
-const asserts = (condition, message) => !condition && throws(message)
 
 /*
 const isChildDir = (src) =>
