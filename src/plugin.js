@@ -13,8 +13,8 @@ const sortUrls = (urls) =>
   []
   .concat(urls)
   .sort((a, b) =>
-    a.length < b.length ? -1 :
-    a.length > b.length ? 1 :
+    a.url.length < b.url.length ? -1 :
+    a.url.length > b.url.length ? 1 :
     0
   )
 

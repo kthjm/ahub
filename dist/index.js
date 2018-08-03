@@ -22,17 +22,15 @@ var buildFavicons = (put, out, config) =>
   Promise.all(
     files
       .map(file => path.join(put, file))
-      .map(source =>
-        fsExtra.pathExists(source).then(isExist => isExist && source)
-      )
+      .map(src => fsExtra.pathExists(src).then(isExist => isExist && src))
   )
-    .then(sources => sources.find(source => typeof source === 'string'))
+    .then(sources => sources.find(src => typeof src === 'string'))
     .then(
-      source =>
-        !source
+      src =>
+        !src
           ? ''
           : favicons(
-              source,
+              src,
               Object.assign({}, config, { path: `/${favname}` })
             ).then(({ html, images, files }) =>
               Promise.all(
@@ -113,7 +111,10 @@ const { assign } = Object
 const sortUrls = urls =>
   []
     .concat(urls)
-    .sort((a, b) => (a.length < b.length ? -1 : a.length > b.length ? 1 : 0))
+    .sort(
+      (a, b) =>
+        a.url.length < b.url.length ? -1 : a.url.length > b.url.length ? 1 : 0
+    )
 
 const createRobotsTxt = hostname => `User-agent: *
 Sitemap: ${url.resolve(hostname, 'sitemap.xml')}`
@@ -201,7 +202,7 @@ var plugin = ({ hostname, lang, head: rootHead = {}, faviconsHtml = '' }) => {
 
 const defaultIgnored = [
   'node_modules**',
-  '.gitignore',
+  '.git**',
   'README.md',
   'LICENSE',
   'favicons.*',
@@ -217,21 +218,25 @@ const isBelong = (child, parent) =>
     .every(splited => splited === '..')
 
 var buildPages = (put, out, verbose, ignored, watch, options) => {
-  const json = plugin(options)
-
-  const build = watch ? chin.watch : chin.chin
-
   ignored = [].concat(
     defaultIgnored,
     isBelong(out, put) ? [out] : [],
     Array.isArray(ignored) ? ignored : []
   )
 
-  watch = Object.assign({}, { ignored, ignoreInitial: true }, watch)
+  const json = plugin(options)
 
-  return build({ put, out, verbose, watch, ignored, processors: { json } })
-    .then(watcher => {})
-    .then(() => json.after())
+  const config = { put, out, verbose, ignored, processors: { json } }
+
+  return !watch
+    ? chin.chin(config).then(() => ({ after: json.after() }))
+    : chin
+        .watch(
+          Object.assign(config, {
+            watch: Object.assign({ ignored, ignoreInitial: true }, watch)
+          })
+        )
+        .then(watcher => ({ watcher, after: json.after() }))
 }
 
 const throws = message => {
@@ -240,10 +245,10 @@ const throws = message => {
 const asserts = (condition, message) => !condition && throws(message)
 
 /*
-const isChildDir = (source) =>
-  pathResolve(source).split(pathSep).length > process.cwd().split(pathSep).length
+const isChildDir = (src) =>
+  pathResolve(src).split(pathSep).length > process.cwd().split(pathSep).length
 
-asserts(isChildDir(source), `${source} is invalid source`)
+asserts(isChildDir(src), `${src} is invalid src`)
 */
 
 const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
@@ -262,25 +267,28 @@ const buildApps = (dest, verbose) =>
   })
 
 const tuft = (
-  source,
+  src,
   dest,
   { favicons: favicons$$1, lang, hostname, head, watch, ignored, verbose } = {}
 ) =>
   Promise.resolve()
     .then(() => {
-      asserts(source, `${source} is invalid source`)
-      asserts(dest, `${dest} is invalid dest`)
+      asserts(src, `${src} is invalid as src`)
+      asserts(dest, `${dest} is invalid as dest`)
     })
-    .then(() => (favicons$$1 ? buildFavicons(source, dest, favicons$$1) : ''))
+    .then(() => (favicons$$1 ? buildFavicons(src, dest, favicons$$1) : ''))
     .then(faviconsHtml =>
-      buildPages(source, dest, verbose, ignored, watch, {
+      buildPages(src, dest, verbose, ignored, watch, {
         hostname,
         lang,
         head,
         faviconsHtml
       })
     )
-    .then(results => results && buildSitemap(dest, results))
-    .then(() => buildApps(dest, verbose))
+    .then(
+      ({ after, watcher }) =>
+        !after ? watcher : buildSitemap(dest, after).then(() => watcher)
+    )
+    .then(watcher => buildApps(dest, verbose).then(() => watcher))
 
 module.exports = tuft

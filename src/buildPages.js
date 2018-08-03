@@ -4,7 +4,7 @@ import plugin from './plugin.js'
 
 const defaultIgnored = [
   'node_modules**',
-  '.gitignore',
+  '.git**',
   'README.md',
   'LICENSE',
   'favicons.*',
@@ -19,20 +19,22 @@ const isBelong = (child, parent) =>
   .every(splited => splited === '..')
 
 export default (put, out, verbose, ignored, watch, options) => {
-
-  const json = plugin(options)
-
-  const build = watch ? chin.watch : chin.chin
-
+  
   ignored = [].concat(
     defaultIgnored,
     isBelong(out, put) ? [ out ] : [],
     Array.isArray(ignored) ? ignored : []
   )
 
-  watch = Object.assign({}, { ignored, ignoreInitial: true }, watch)
+  const json = plugin(options)
 
-  return build({ put, out, verbose, watch, ignored, processors: { json } })
-  .then(watcher => {})
-  .then(() => json.after())
+  const config = { put, out, verbose, ignored, processors: { json } }
+
+  return !watch
+  ? chin
+    .chin(config)
+    .then(() => ({ after: json.after() }))
+  : chin
+    .watch(Object.assign(config, { watch: Object.assign({ ignored, ignoreInitial: true }, watch) }))
+    .then(watcher => ({ watcher, after: json.after() }))
 }

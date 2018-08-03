@@ -16,8 +16,8 @@
     "instrument": false
   },
   "tuft": {
-    "source": ".put",
-    "dest": ".out",
+    "//source": ".put",
+    "//dest": ".out",
     "hostname": "https://hoge.com",
     "lang": "ja",
     "watch": {
@@ -27,7 +27,10 @@
       "appName": "appName",
       "appDescription": "appDescription"
     },
-    "ignored": []
+    "ignored": [
+      ".circleci**",
+      ".nyc_output**"
+    ]
   },
   "scripts": {
     "tuft": "cross-env BABEL_ENV=BIN node -r babel-register src/bin.index.js",

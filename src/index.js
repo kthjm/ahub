@@ -6,10 +6,10 @@ import buildPages from './buildPages.js'
 import { asserts } from './util.js'
 
 /*
-const isChildDir = (source) =>
-  pathResolve(source).split(pathSep).length > process.cwd().split(pathSep).length
+const isChildDir = (src) =>
+  pathResolve(src).split(pathSep).length > process.cwd().split(pathSep).length
 
-asserts(isChildDir(source), `${source} is invalid source`)
+asserts(isChildDir(src), `${src} is invalid src`)
 */
 
 const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
@@ -28,23 +28,23 @@ const buildApps = (dest, verbose) =>
   })
 
 const tuft = (
-  source,
+  src,
   dest,
   { favicons, lang, hostname, head, watch, ignored, verbose } = {}
 ) =>
   Promise.resolve()
   .then(() => {
-    asserts(source, `${source} is invalid source`)
-    asserts(dest, `${dest} is invalid dest`)
+    asserts(src, `${src} is invalid as src`)
+    asserts(dest, `${dest} is invalid as dest`)
   })
   .then(() =>
     favicons
-    ? buildFavicons(source, dest, favicons)
+    ? buildFavicons(src, dest, favicons)
     : ''
   )
   .then(faviconsHtml =>
     buildPages(
-      source,
+      src,
       dest,
       verbose,
       ignored,
@@ -52,12 +52,13 @@ const tuft = (
       { hostname, lang, head, faviconsHtml }
     )
   )
-  .then(results =>
-    results &&
-    buildSitemap(dest, results)
+  .then(({ after, watcher }) =>
+    !after
+    ? watcher
+    : buildSitemap(dest, after).then(() => watcher)
   )
-  .then(() =>
-    buildApps(dest, verbose)
+  .then(watcher =>
+    buildApps(dest, verbose).then(() => watcher)
   )
 
 export default tuft

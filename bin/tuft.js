@@ -10,17 +10,22 @@ var path = require('path')
 var tuft = _interopDefault(require('..'))
 var program = _interopDefault(require('commander'))
 
-const CONFIG_PATH = 'tuft.json'
-const DESTINATION = '.site'
+const throws = message => {
+  throw new Error(message)
+}
 
-const normalizeConfig = (source, dest, configPath, isPro, isWatch) =>
+const SRC = '.'
+const DEST = '.site'
+const CONFIG = 'tuft.json'
+
+const normalizeConfig = (src, dest, configPath, isPro, isWatch) =>
   Promise.resolve()
     .then(
       () =>
         typeof configPath === 'string'
           ? fsExtra.readJson(configPath)
           : fsExtra
-              .readJson(CONFIG_PATH)
+              .readJson(CONFIG)
               .catch(() =>
                 fsExtra
                   .readJson('package.json')
@@ -28,8 +33,8 @@ const normalizeConfig = (source, dest, configPath, isPro, isWatch) =>
               )
     )
     .then(config => ({
-      source: source || config.source,
-      dest: dest || config.dest || DESTINATION,
+      src: src || config.src || SRC,
+      dest: dest || config.dest || DEST,
       lang: config.lang,
       hostname: isPro ? config.hostname : undefined,
       favicons: isPro ? config.favicons || true : undefined,
@@ -39,15 +44,16 @@ const normalizeConfig = (source, dest, configPath, isPro, isWatch) =>
     }))
     .then(config =>
       fsExtra
-        .readJson(path.join(config.source, 'index.json'))
+        .readJson(path.join(config.src, 'index.json'))
         .then(({ head = {} }) => Object.assign({}, config, { head }))
+        .catch(() => throws(`[src]/index.json is required`))
     )
 
-var action = (source, dest, configPath, isPro, isWatch, quiet) =>
-  normalizeConfig(source, dest, configPath, isPro, isWatch).then(
-    ({ source, dest, lang, hostname, head, watch, favicons, ignored }) =>
+var action = (src, dest, configPath, isPro, isWatch, quiet) =>
+  normalizeConfig(src, dest, configPath, isPro, isWatch).then(
+    ({ src, dest, lang, hostname, head, watch, favicons, ignored }) =>
       fsExtra.remove(dest).then(() =>
-        tuft(source, dest, {
+        tuft(src, dest, {
           lang,
           hostname,
           head,
@@ -60,23 +66,35 @@ var action = (source, dest, configPath, isPro, isWatch, quiet) =>
   )
 
 program
-  .arguments('[source] [dest]')
-  .usage(`[source] [dest: '${DESTINATION}'] [options]`)
+  .arguments('[src] [dest]')
+  .usage(`[src] [dest] [options]`)
+  .description(
+    `
+  Default:
+    src:  '${SRC}'
+    dest: '${DEST}'
+`
+  )
   .option(
     `-c, --config <jsonfile>`,
-    `default: '${CONFIG_PATH}' || packagejson.tuft`
+    `default: '${CONFIG}' || packagejson['tuft']`
   )
   .option('-p, --product', 'build as production')
   .option('-q, --quiet', 'without log')
-  // .option('-w, --watch', 'watch')
+  .option('-w, --watch', 'watch')
   .on('--help', () =>
     console.log(`
+
   https://github.com/kthjm/tuft/blob/master/README.md
+
 `)
   )
   .version(require('../package.json').version, '-v, --version')
-  .action((source, dest, { config, product, watch, quiet }) =>
-    action(source, dest, config, product, watch, quiet).catch(console.error)
+  .action((src, dest, { config, product, watch, quiet }) =>
+    action(src, dest, config, product, watch, quiet).catch(err => {
+      console.error(err)
+      process.exit(1)
+    })
   )
   .parse(process.argv)
 

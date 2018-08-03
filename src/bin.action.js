@@ -1,24 +1,26 @@
 import { readJson, remove } from 'fs-extra'
 import { join as pathJoin } from 'path'
+import { throws } from './util.js'
 import tuft from '..'
 
-export const CONFIG_PATH = 'tuft.json'
-export const DESTINATION = '.site'
+export const SRC = '.'
+export const DEST = '.site'
+export const CONFIG = 'tuft.json'
 
-const normalizeConfig = (source, dest, configPath, isPro, isWatch) =>
+const normalizeConfig = (src, dest, configPath, isPro, isWatch) =>
   Promise.resolve()
   .then(() =>
     typeof configPath === 'string'
     ? readJson(configPath)
-    : readJson(CONFIG_PATH).catch(() =>
+    : readJson(CONFIG).catch(() =>
       readJson('package.json').then(userPackageJson =>
         userPackageJson.tuft || {}
       )
     )
   )
   .then(config => ({
-    source:   source || config.source,
-    dest:     dest || config.dest || DESTINATION,
+    src:      src  || config.src  || SRC,
+    dest:     dest || config.dest || DEST,
     lang:     config.lang,
     hostname: isPro ? config.hostname : undefined,
     favicons: isPro ? config.favicons || true : undefined,
@@ -27,15 +29,22 @@ const normalizeConfig = (source, dest, configPath, isPro, isWatch) =>
     head:     undefined
   }))
   .then(config =>
-    readJson(pathJoin(config.source, 'index.json'))
-    .then(({ head = {} }) => Object.assign({}, config, { head }))
+    readJson(
+      pathJoin(config.src, 'index.json')
+    )
+    .then(({ head = {} }) =>
+      Object.assign({}, config, { head })
+    )
+    .catch(() =>
+      throws(`[src]/index.json is required`)
+    )
   )
 
-export default (source, dest, configPath, isPro, isWatch, quiet) =>
-  normalizeConfig(source, dest, configPath, isPro, isWatch)
-  .then(({ source, dest, lang, hostname, head, watch, favicons, ignored }) =>
+export default (src, dest, configPath, isPro, isWatch, quiet) =>
+  normalizeConfig(src, dest, configPath, isPro, isWatch)
+  .then(({ src, dest, lang, hostname, head, watch, favicons, ignored }) =>
     remove(dest).then(() =>
-      tuft(source, dest, {
+      tuft(src, dest, {
         lang,
         hostname,
         head,

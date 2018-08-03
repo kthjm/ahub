@@ -15,16 +15,16 @@ export default (put, out, config) =>
   Promise.all(
     files
     .map(file => pathJoin(put, file))
-    .map(source => pathExists(source).then(isExist => isExist && source))
+    .map(src => pathExists(src).then(isExist => isExist && src))
   )
   .then(sources =>
     sources
-    .find(source => typeof source === 'string')
+    .find(src => typeof src === 'string')
   )
-  .then(source =>
-    !source
+  .then(src =>
+    !src
     ? ''
-    : favicons(source, Object.assign({}, config, { path: `/${favname}` }))
+    : favicons(src, Object.assign({}, config, { path: `/${favname}` }))
     .then(({ html, images, files }) =>
       Promise
       .all(

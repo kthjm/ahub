@@ -34,11 +34,7 @@ const configs = {
     clean: true,
     watch: {},
     after: () =>
-      tuft(
-        '.put',
-        '.out',
-        { watch: true, verbose: true }
-      ).then(() =>
+      tuft('.put', '.out', { watch: true, verbose: true }).then(() =>
         bs.create().init({ server: '.out', watch: true })
       )
   },

@@ -1,27 +1,39 @@
 import program from 'commander'
-import action, { DESTINATION, CONFIG_PATH } from './bin.action.js'
+import action, { SRC, DEST, CONFIG } from './bin.action.js'
 
 program
-.arguments('[source] [dest]')
-.usage(`[source] [dest: '${DESTINATION}'] [options]`)
-.option(`-c, --config <jsonfile>`, `default: '${CONFIG_PATH}' || packagejson.tuft`)
+.arguments('[src] [dest]')
+.usage(`[src] [dest] [options]`)
+.description(
+`
+  Default:
+    src:  '${SRC}'
+    dest: '${DEST}'
+`
+)
+.option(`-c, --config <jsonfile>`, `default: '${CONFIG}' || packagejson['tuft']`)
 .option('-p, --product', 'build as production')
 .option('-q, --quiet', 'without log')
-// .option('-w, --watch', 'watch')
+.option('-w, --watch', 'watch')
 .on('--help', () => console.log(`
+
   https://github.com/kthjm/tuft/blob/master/README.md
+
 `))
 .version(require('../package.json').version, '-v, --version')
-.action((source, dest, { config, product, watch, quiet }) =>
+.action((src, dest, { config, product, watch, quiet }) =>
   action(
-    source,
+    src,
     dest,
     config,
     product,
     watch,
     quiet
   )
-  .catch(console.error)
+  .catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
 )
 .parse(process.argv)
 
