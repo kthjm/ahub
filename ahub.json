@@ -1,8 +1,9 @@
 {
   "src": ".put",
   "dest": ".out",
-  "hostname": "https://hoge.com",
-  "lang": "ja",
+  "sitemap": {
+    "hostname": "https://hoge.com"
+  },
   "watch": {
     "ignoreInitial": true
   },

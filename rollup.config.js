@@ -23,11 +23,12 @@ export default [
   {
     input: 'src/index.js',
     output: { format: 'cjs', file: 'dist/index.js' },
+    external: ['react-dom/server'],
     plugins
   },
   {
     input: 'src/bin.index.js',
-    output: { format: 'cjs', file: 'bin/tuft.js', banner: shebang },
+    output: { format: 'cjs', file: 'bin/ahub.js', banner: shebang },
     external: ['..'],
     plugins
   }

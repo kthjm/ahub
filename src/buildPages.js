@@ -1,6 +1,5 @@
 import * as chin from 'chin'
 import { relative as pathRelative, sep as pathSep } from 'path'
-import plugin from './plugin.js'
 import { CONFIG } from './util.js'
 
 const defaultIgnored = [
@@ -20,23 +19,26 @@ const isBelong = (child, parent) =>
   .split(pathSep)
   .every(splited => splited === '..')
 
-export default (put, out, verbose, ignored, watch, options) => {
+export default ({
+  put,
+  out,
+  verbose,
+  processors,
+  userIgnored,
+  chokidarOpts,
+}) => {
+  const build = chin[chokidarOpts ? 'watch' : 'chin']
 
-  ignored = [].concat(
+  const ignored = [].concat(
     defaultIgnored,
     isBelong(out, put) ? [ out ] : [],
-    Array.isArray(ignored) ? ignored : []
+    Array.isArray(userIgnored) ? userIgnored : []
   )
 
-  const json = plugin(options)
+  const watch = Object.assign(
+    { ignored, ignoreInitial: true },
+    chokidarOpts
+  )
 
-  const config = { put, out, verbose, ignored, processors: { json } }
-
-  return !watch
-  ? chin
-    .chin(config)
-    .then(() => ({ after: json.after() }))
-  : chin
-    .watch(Object.assign(config, { watch: Object.assign({ ignored, ignoreInitial: true }, watch) }))
-    .then(watcher => ({ watcher, after: json.after() }))
+  return build({ put, out, verbose, processors, ignored, watch })
 }

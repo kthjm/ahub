@@ -1,3 +1,7 @@
+app.src/
+app.dist/
+.garbage/
+.put/
 # app/
 # dist/
 # bin/

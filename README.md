@@ -1,5 +1,8 @@
-# tuft
+# ahub
 
+
+
+<!--
 page:
 ```json
 {
@@ -39,13 +42,13 @@ config:
 ```
 shell:
 ```shell
-  Usage: tuft [source] [dest: '.site'] [options]
+  Usage: ahub [source] [dest: '.site'] [options]
 
   Options:
 
-    -c, --config <jsonfile>  default: 'tuft.json' || packagejson.tuft
+    -c, --config <jsonfile>  default: 'ahub.json' || packagejson.ahub
     -p, --product            build as production
     -q, --quiet              without log
     -v, --version            output the version number
     -h, --help               output usage information
-```
+``` -->
