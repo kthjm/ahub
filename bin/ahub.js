@@ -41,7 +41,7 @@ const createPage = (isIndex, embed) =>
         inherit: false,
         head: {
           title: '',
-          og: true,
+          og: false,
           ga: '',
           tags: []
         },
@@ -181,20 +181,11 @@ const serve = (ahub$$1, verbose, options) =>
         )
   )
 
-const create = (path$$1, isIndex, hub) => {
+const create = (path$$1, isIndex) => {
   path$$1 = path.extname(path$$1) !== '.json' ? `${path$$1}.json` : path$$1
   return fsExtra.outputFile(
     path.normalize(path$$1),
-    jtringify(
-      createPage(isIndex, {
-        title: filename(path$$1),
-        hub1: !hub
-          ? undefined
-          : path.extname(hub) === '.json'
-            ? thinext(filename(hub))
-            : filename(hub)
-      })
-    )
+    jtringify(createPage(isIndex, { title: filename(path$$1) }))
   )
 }
 
@@ -207,18 +198,18 @@ const init = (src, dest) =>
         jtringify(
           createPage(true, {
             title: 'index.json',
-            hub1: 'path1',
-            hub2: 'path2'
+            hub1: 'page1',
+            hub2: 'page2'
           })
         )
       ],
       [
-        path.join(src, 'path1.json'),
-        jtringify(createPage(false, { title: 'path1.json', hub1: 'path2' }))
+        path.join(src, 'page1.json'),
+        jtringify(createPage(false, { title: 'page1.json', hub1: 'page2' }))
       ],
       [
-        path.join(src, 'path2.json'),
-        jtringify(createPage(false, { title: 'path2.json', hub1: 'path1' }))
+        path.join(src, 'page2.json'),
+        jtringify(createPage(false, { title: 'page2.json', hub1: 'page1' }))
       ]
     ].map(arg => fsExtra.outputFile(...arg))
   )
@@ -228,12 +219,6 @@ const jtringify = obj => JSON.stringify(obj, null, '\t')
 const filename = path$$1 => {
   const splited = path.normalize(path$$1).split(path.sep)
   return splited[splited.length - 1]
-}
-
-const thinext = filename => {
-  const splited = filename.split('.')
-  splited.pop()
-  return splited.join('.')
 }
 
 const errorHandler = err => {
@@ -258,23 +243,16 @@ program
   .action((src, dest) => init(src, dest).catch(errorHandler))
 
 program
-  .command('create <path...>')
-  .usage(`<path...> [options]`)
+  .command('create <page...>')
+  .usage(`<page...> [options]`)
   .option('-i, --index', '')
   .on('--help', () => console.log(``))
   .action((paths, { index: isIndex }) =>
     Promise.all(
       paths
-        .map(
-          path$$1 => (path$$1.includes(',') ? path$$1.split(',') : [path$$1])
-        )
+        .map(page => (page.includes(',') ? page.split(',') : [page]))
         .reduce((a, c) => a.concat(c), [])
-        .map(
-          (path$$1, index, paths) =>
-            !isIndex && paths.length > 1
-              ? create(path$$1, false, paths[index + 1] || paths[0])
-              : create(path$$1, isIndex)
-        )
+        .map(page => create(page, isIndex))
     ).catch(errorHandler)
   )
 

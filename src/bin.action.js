@@ -56,20 +56,11 @@ export const serve = (ahub, verbose, options) => normalizeConfig(options)
   .then(watcher => browsersync.create().init({ server: dest, watch: true, notify: false }))
 )
 
-export const create = (path, isIndex, hub) => {
+export const create = (path, isIndex) => {
   path = extname(path) !== '.json' ? `${path}.json` : path
   return outputFile(
     normalize(path),
-    jtringify(createPage(isIndex, {
-      title: filename(path),
-      hub1: (
-        !hub
-        ? undefined :
-        extname(hub) === '.json'
-        ? thinext(filename(hub))
-        : filename(hub)
-      )
-    }))
+    jtringify(createPage(isIndex, { title: filename(path) }))
   )
 }
 
@@ -81,15 +72,15 @@ export const init = (src, dest) => Promise.all(
     ],
     [
       join(src, 'index.json'),
-      jtringify(createPage(true, { title: 'index.json', hub1: 'path1', hub2: 'path2' }))
+      jtringify(createPage(true, { title: 'index.json', hub1: 'page1', hub2: 'page2' }))
     ],
     [
-      join(src, 'path1.json'),
-      jtringify(createPage(false, { title: 'path1.json', hub1: 'path2' }))
+      join(src, 'page1.json'),
+      jtringify(createPage(false, { title: 'page1.json', hub1: 'page2' }))
     ],
     [
-      join(src, 'path2.json'),
-      jtringify(createPage(false, { title: 'path2.json', hub1: 'path1' }))
+      join(src, 'page2.json'),
+      jtringify(createPage(false, { title: 'page2.json', hub1: 'page1' }))
     ]
   ]
   .map(arg => outputFile(...arg))

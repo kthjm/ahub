@@ -25,19 +25,17 @@ program
 )
 
 program
-.command('create <path...>')
-.usage(`<path...> [options]`)
+.command('create <page...>')
+.usage(`<page...> [options]`)
 .option('-i, --index', '')
 .on('--help', () => console.log(``))
 .action((paths, { index: isIndex }) =>
   Promise.all(
     paths
-    .map(path => path.includes(',') ? path.split(',') : [path])
+    .map(page => page.includes(',') ? page.split(',') : [page])
     .reduce((a, c) => a.concat(c), [])
-    .map((path, index, paths) =>
-      !isIndex && paths.length > 1
-      ? create(path, false, paths[index + 1] || paths[0])
-      : create(path, isIndex)
+    .map(page =>
+      create(page, isIndex)
     )
   )
   .catch(errorHandler)

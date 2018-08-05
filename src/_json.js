@@ -25,7 +25,7 @@ export const createPage = (isIndex, embed) =>
   inherit: false,
   head: {
     title: '',
-    og: true,
+    og: false,
     ga: '',
     tags: []
   },
