@@ -1,5 +1,6 @@
 # directories
 src export-ignore
+.circleci
 
 # git files
 .gitattributes export-ignore
