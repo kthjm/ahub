@@ -32,6 +32,7 @@ export default (template, options) => {
     .then(() => template(props, pathname))
     .then(html => [
       pathFormat(reout),
+      // '<!DOCTYPE html>' + html
       pretty('<!DOCTYPE html>' + html, { ocd: true })
     ])
   }

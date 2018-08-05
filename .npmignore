@@ -1,10 +1,11 @@
 .circleci/
 src/
-test/
 .babelrc
+.gitattributes
 .gitignore
-chin.config.js
 codecov.yml
-rogo.svg
 rollup.config.js
+script.prestart.js
+script.start.js
+test.js
 yarn.lock

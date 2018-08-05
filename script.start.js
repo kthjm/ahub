@@ -1,8 +1,16 @@
 process.env.BABEL_ENV = 'ENV'
 require('babel-register')
+
 const ahub = require('./src').default
-ahub('.put', '.out', {
-  watch: true,
-  verbose: true,
-  indexJson: require('./.put/index.json')
-})
+const Html = require('./src/Html').default
+const { createTemplate } = require('./src/bin.action.js')
+
+ahub(
+  '.put',
+  '.out',
+  createTemplate(Html, './.put/index.json'),
+  {
+    watch: true,
+    verbose: true
+  }
+)

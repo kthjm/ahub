@@ -1,6 +1,6 @@
 import * as chin from 'chin'
 import { relative as pathRelative, sep as pathSep } from 'path'
-import { CONFIG } from './bin.action.js'
+import { CONFIG } from './variables.js'
 
 const defaultIgnored = [
   CONFIG,

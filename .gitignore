@@ -6,6 +6,7 @@ app.dist/
 _config.json
 # app/
 # dist/
+# component/
 # bin/
 
 # Logs

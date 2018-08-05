@@ -2,7 +2,9 @@ import program from 'commander'
 import { cross } from 'figures'
 import { red } from 'chalk'
 import ahub from '..'
-import { init, create, serve, build, SRC, DEST, CONFIG } from './bin.action.js'
+import Html from '../component'
+import { init, create, serve, build } from './bin.action.js'
+import { SRC, DEST, CONFIG } from './variables.js'
 
 const FAIL_PRE = red(cross)
 
@@ -55,6 +57,7 @@ program
   serve(ahub, !quiet, {
     src,
     dest,
+    Html,
     configPath: config,
     isWatch: true
   })
@@ -71,6 +74,7 @@ program
   build(ahub, !quiet, {
     src,
     dest,
+    Html,
     configPath: config,
     isProduct: true
   })

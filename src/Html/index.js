@@ -4,8 +4,6 @@ import createTag from 'html-tag'
 import Head from './Head.js'
 import Body from './Body.js'
 
-export default (props) => <Html {...normalizeProps(props)} />
-
 const Html = ({ pathname, lang, head, body }) =>
 <html lang={!lang ? undefined : lang}>
   <Head {...head} />
@@ -70,3 +68,8 @@ const tags2markup = (tags) =>
   !Array.isArray(tags)
   ? ''
   : tags.filter(Array.isArray).map(arg => createTag(...arg)).join('')
+
+const Ahub = (props = {}) =>
+  <Html {...normalizeProps(props)} />
+
+export default Ahub
