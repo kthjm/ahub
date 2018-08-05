@@ -22,7 +22,7 @@ const createConfig = (src, dest = '') => ({
   src,
   dest,
   sitemap: {
-    hostname: 'https://foo.bar'
+    hostname: 'https://foo.com'
   },
   favicons: {
     appName: '',
@@ -56,7 +56,7 @@ const createPage = (isIndex, embed) =>
 const bodyUnique = ({ title, hub1, hub2 } = {}) => ({
   header: {
     image:
-      'https://imgplaceholder.com/420x420/f3f3f3/c0c0c0/glyphicon-user?text=ahub&font-size=200',
+      'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
     description: '{ description }'
   },
@@ -137,12 +137,19 @@ const normalizeConfig = ({ src, dest, configPath, isWatch, isProduct }) =>
       ignored: config.ignored,
       indexJson: undefined
     }))
-    .then(config =>
-      fsExtra
-        .readJson(path.join(config.src, 'index.json'))
-        .then(indexJson => Object.assign({}, config, { indexJson }))
-        .catch(() => throws(`[src]/index.json is required`))
-    )
+    .then(config => {
+      const indexJsonPath = path.join(config.src, 'index.json')
+      return fsExtra
+        .pathExists(indexJsonPath)
+        .then(
+          isExist =>
+            !isExist
+              ? throws(`[src]/index.json is required`)
+              : Object.assign(config, {
+                  indexJson: () => fsExtra.readJson(indexJsonPath)
+                })
+        )
+    })
 
 const build = (ahub$$1, verbose, options) =>
   normalizeConfig(options).then(

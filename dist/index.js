@@ -590,14 +590,27 @@ const ahub = (
     })
     .then(() => (!favicons ? '' : buildFavicons(src, dest, favicons)))
     .then(faviconsHtml => {
-      const template = (props, pathname) =>
-        server.renderToStaticMarkup(
-          React__default.createElement(
-            Html,
-            _extends({}, props, { pathname, indexJson, faviconsHtml })
-          )
-        )
+      const template =
+        typeof indexJson === 'function'
+          ? (props, pathname) =>
+              indexJson().then(indexJson =>
+                server.renderToStaticMarkup(
+                  React__default.createElement(
+                    Html,
+                    _extends({}, props, { pathname, indexJson, faviconsHtml })
+                  )
+                )
+              )
+          : (props, pathname) =>
+              server.renderToStaticMarkup(
+                React__default.createElement(
+                  Html,
+                  _extends({}, props, { pathname, indexJson, faviconsHtml })
+                )
+              )
+
       const json2html = j2h(template, { sitemap: sitemap$$1 })
+
       return buildPages({
         put: src,
         out: dest,

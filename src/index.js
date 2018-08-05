@@ -24,8 +24,15 @@ Promise.resolve()
   : buildFavicons(src, dest, favicons)
 )
 .then(faviconsHtml => {
-  const template = (props, pathname) => render(<Html {...props} {...{ pathname, indexJson, faviconsHtml }} />)
+
+  const template = typeof indexJson === 'function'
+  ? (props, pathname) => indexJson().then(indexJson =>
+    render(<Html {...props} {...{ pathname, indexJson, faviconsHtml }} />))
+  : (props, pathname) =>
+    render(<Html {...props} {...{ pathname, indexJson, faviconsHtml }} />)
+
   const json2html = j2h(template, { sitemap })
+
   return buildPages({
     put: src,
     out: dest,

@@ -1,4 +1,4 @@
-import { readJson, remove, outputFile } from 'fs-extra'
+import { pathExists, readJson, remove, outputFile } from 'fs-extra'
 import browsersync from 'browser-sync'
 import { join, parse, extname, normalize, sep } from 'path'
 import { throws } from './util.js'
@@ -31,17 +31,15 @@ const normalizeConfig = ({ src, dest, configPath, isWatch, isProduct }) =>
     ignored:   config.ignored,
     indexJson: undefined
   }))
-  .then(config =>
-    readJson(
-      join(config.src, 'index.json')
+  .then(config => {
+    const indexJsonPath = join(config.src, 'index.json')
+    return pathExists(indexJsonPath)
+    .then(isExist =>
+      !isExist
+      ? throws(`[src]/index.json is required`)
+      : Object.assign(config, { indexJson: () => readJson(indexJsonPath) })
     )
-    .then(indexJson =>
-      Object.assign({}, config, { indexJson })
-    )
-    .catch(() =>
-      throws(`[src]/index.json is required`)
-    )
-  )
+  })
 
 export const build = (ahub, verbose, options) => normalizeConfig(options)
 .then(({ src, dest, sitemap, indexJson, watch, favicons, ignored }) =>

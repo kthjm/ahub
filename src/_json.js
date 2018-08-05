@@ -4,7 +4,7 @@ export const createConfig = (src, dest = '') => ({
   src,
   dest,
   sitemap: {
-    hostname: 'https://foo.bar'
+    hostname: 'https://foo.com'
   },
   favicons: {
     appName: '',
@@ -34,7 +34,7 @@ export const createPage = (isIndex, embed) =>
 
 const bodyUnique = ({ title, hub1, hub2 } = {}) => ({
   header: {
-    image: 'https://imgplaceholder.com/420x420/f3f3f3/c0c0c0/glyphicon-user?text=ahub&font-size=200',
+    image: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
     description: '{ description }'
   },
