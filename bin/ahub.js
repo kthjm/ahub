@@ -175,7 +175,9 @@ const serve = (ahub$$1, verbose, options) =>
           })
         )
         .then(watcher =>
-          browsersync.create().init({ server: dest, watch: true })
+          browsersync
+            .create()
+            .init({ server: dest, watch: true, notify: false })
         )
   )
 
