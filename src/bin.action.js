@@ -1,13 +1,8 @@
-/*  */
 import React from 'react'
 import { renderToStaticMarkup as render } from 'react-dom/server'
-
-/*  */
 import { pathExists, readJson, remove, outputFile } from 'fs-extra'
 import browsersync from 'browser-sync'
 import { join, parse, extname, normalize, sep } from 'path'
-
-/*  */
 import { throws } from './util.js'
 import { createConfig, createPage } from './_json.js'
 import { SRC, DEST, CONFIG } from './variables.js'

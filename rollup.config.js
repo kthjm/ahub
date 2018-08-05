@@ -1,14 +1,25 @@
 import flow from 'rollup-plugin-flow'
 import babel from 'rollup-plugin-babel'
 import autoExternal from 'rollup-plugin-auto-external'
+import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import prettier from 'rollup-plugin-prettier'
+import path from 'path'
 
 const shebang = '#!/usr/bin/env node'
 
 const plugins = [
-  flow({ pretty: true }),
-  babel({ exclude: 'node_modules/**' }),
+  flow({
+    pretty: true
+  }),
+  babel({
+    exclude: 'node_modules/**'
+  }),
+  resolve({
+    jsnext: true,
+    main: true,
+    jail: './src'
+  }),
   commonjs(),
   autoExternal({
     builtins: true,
@@ -23,19 +34,29 @@ const plugins = [
 
 export default [
   {
+    plugins,
     input: 'src/index.js',
-    output: { format: 'cjs', file: 'dist/index.js' },
-    plugins
+    output: [
+      { format: 'cjs', file: 'dist/cjs.js' },
+      { format: 'es', file: 'dist/es.js' }
+    ]
   },
   {
+    plugins,
     input: 'src/Html/index.js',
-    output: { format: 'cjs', file: 'component/index.js' },
-    plugins
+    output: [
+      { format: 'cjs', file: 'component/cjs.js' },
+      { format: 'es', file: 'component/es.js' }
+    ]
   },
   {
+    plugins,
     input: 'src/bin.index.js',
     output: { format: 'cjs', file: 'bin/ahub.js', banner: shebang },
-    external: ['..', 'react-dom/server'],
-    plugins
+    external: [
+      '..',
+      path.resolve('./component'),
+      'react-dom/server'
+    ]
   }
 ]

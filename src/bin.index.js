@@ -40,9 +40,7 @@ program
     paths
     .map(page => page.includes(',') ? page.split(',') : [page])
     .reduce((a, c) => a.concat(c), [])
-    .map(page =>
-      create(page, isIndex)
-    )
+    .map(page => create(page, isIndex))
   )
   .catch(errorHandler)
 )
