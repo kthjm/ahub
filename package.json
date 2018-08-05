@@ -29,9 +29,10 @@
   "dependencies": {
     "atra": "^1.2.3",
     "browser-sync": "^2.24.6",
+    "chalk": "^2.4.1",
     "chin": "https://github.com/chinjs/chin#3.1.2",
     "commander": "^2.16.0",
-    "favicons": "^5.1.1",
+    "figures": "^2.0.0",
     "fs-extra": "^7.0.0",
     "html-tag": "^2.0.0",
     "pretty": "^2.0.0",
@@ -65,5 +66,8 @@
     "rollup-plugin-prettier": "^0.4.0",
     "serve": "^9.4.0",
     "stylus": "^0.54.5"
+  },
+  "optionalDependencies": {
+    "favicons": "^5.1.1"
   }
 }

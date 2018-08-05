@@ -51,8 +51,8 @@
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.0.0-beta.51.tgz#27cec2df409df60af58270ed8f6aa55409ea86f6"
 
 "@babel/polyfill@^7.0.0-beta.42":
-  version "7.0.0-beta.55"
-  resolved "https://registry.yarnpkg.com/@babel/polyfill/-/polyfill-7.0.0-beta.55.tgz#fc68159a3a32f67d4003298ee69d3412622b5303"
+  version "7.0.0-beta.56"
+  resolved "https://registry.yarnpkg.com/@babel/polyfill/-/polyfill-7.0.0-beta.56.tgz#6942d474d0e9cee7124477df11e97ba192764919"
   dependencies:
     core-js "^2.5.7"
     regenerator-runtime "^0.11.1"
@@ -1340,8 +1340,8 @@ clone@^1.0.4:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
 
 clone@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.1.tgz#d217d1e961118e3ac9a4b8bba3285553bf647cdb"
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
 
 cloneable-readable@^1.0.0:
   version "1.1.2"

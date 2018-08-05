@@ -1,6 +1,6 @@
-import favicons from 'favicons'
 import { pathExists, outputFile } from 'fs-extra'
 import { join as pathJoin } from 'path'
+import { throws } from './util.js'
 
 const favname = 'favicons'
 const favpath = `/_${favname}`
@@ -22,8 +22,10 @@ export default (put, out, config) =>
     sources
     .find(src => typeof src === 'string')
   )
-  .then(src => !src ? '' :
-    favicons(src, Object.assign({}, config, { path: favpath }))
+  .then(src => !src ? '' : require('favicons')(
+      src,
+      Object.assign({}, config, { path: favpath })
+    )
     .then(({ html, images, files }) =>
       Promise
       .all(

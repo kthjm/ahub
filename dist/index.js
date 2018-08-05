@@ -4,7 +4,6 @@ function _interopDefault(ex) {
   return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex
 }
 
-var favicons = _interopDefault(require('favicons'))
 var fsExtra = require('fs-extra')
 var path = require('path')
 var url = require('url')
@@ -18,6 +17,21 @@ var Atra = _interopDefault(require('atra'))
 var h2r = _interopDefault(require('react-html-parser'))
 var createTag = _interopDefault(require('html-tag'))
 var server = require('react-dom/server')
+
+const throws = err => {
+  throw typeof err === 'string' ? new Error(err) : err
+}
+
+const asserts = (condition, message) => !condition && throws(message)
+
+const arr2nesty = (array, length) =>
+  array.reduce(
+    (a, c) =>
+      (a[a.length - 1].length === length
+        ? a.push([c])
+        : a[a.length - 1].push(c)) && a,
+    [[]]
+  )
 
 const favname = 'favicons'
 const favpath = `/_${favname}`
@@ -35,34 +49,19 @@ var buildFavicons = (put, out, config) =>
       src =>
         !src
           ? ''
-          : favicons(src, Object.assign({}, config, { path: favpath })).then(
-              ({ html, images, files }) =>
-                Promise.all(
-                  []
-                    .concat(images, files)
-                    .map(({ name, contents }) =>
-                      fsExtra.outputFile(
-                        path.join(out, favpath, name),
-                        contents
-                      )
-                    )
-                ).then(() => html.join(''))
+          : require('favicons')(
+              src,
+              Object.assign({}, config, { path: favpath })
+            ).then(({ html, images, files }) =>
+              Promise.all(
+                []
+                  .concat(images, files)
+                  .map(({ name, contents }) =>
+                    fsExtra.outputFile(path.join(out, favpath, name), contents)
+                  )
+              ).then(() => html.join(''))
             )
     )
-
-const throws = message => {
-  throw new Error(message)
-}
-const asserts = (condition, message) => !condition && throws(message)
-
-const arr2nesty = (array, length) =>
-  array.reduce(
-    (a, c) =>
-      (a[a.length - 1].length === length
-        ? a.push([c])
-        : a[a.length - 1].push(c)) && a,
-    [[]]
-  )
 
 /*
 
@@ -576,7 +575,7 @@ const ahub = (
   src,
   dest,
   {
-    favicons: favicons$$1,
+    favicons,
     verbose,
     sitemap: sitemap$$1,
     indexJson,
@@ -589,7 +588,7 @@ const ahub = (
       asserts(src, `${src} is invalid as src`)
       asserts(dest, `${dest} is invalid as dest`)
     })
-    .then(() => (!favicons$$1 ? '' : buildFavicons(src, dest, favicons$$1)))
+    .then(() => (!favicons ? '' : buildFavicons(src, dest, favicons)))
     .then(faviconsHtml => {
       const template = (props, pathname) =>
         server.renderToStaticMarkup(

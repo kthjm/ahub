@@ -1,9 +1,13 @@
 import program from 'commander'
+import { cross } from 'figures'
+import { red } from 'chalk'
 import ahub from '..'
 import { init, create, serve, build, SRC, DEST, CONFIG } from './bin.action.js'
 
+const FAIL_PRE = red(cross)
+
 const errorHandler = (err) => {
-  console.error(err)
+  console.error(FAIL_PRE, err)
   process.exit(1)
 }
 

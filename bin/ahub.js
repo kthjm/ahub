@@ -10,10 +10,12 @@ var fsExtra = require('fs-extra')
 var browsersync = _interopDefault(require('browser-sync'))
 var path = require('path')
 var program = _interopDefault(require('commander'))
+var figures = require('figures')
+var chalk = require('chalk')
 var ahub = _interopDefault(require('..'))
 
-const throws = message => {
-  throw new Error(message)
+const throws = err => {
+  throw typeof err === 'string' ? new Error(err) : err
 }
 
 const createConfig = (src, dest = '') => ({
@@ -221,8 +223,10 @@ const filename = path$$1 => {
   return splited[splited.length - 1]
 }
 
+const FAIL_PRE = chalk.red(figures.cross)
+
 const errorHandler = err => {
-  console.error(err)
+  console.error(FAIL_PRE, err)
   process.exit(1)
 }
 
