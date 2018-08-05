@@ -53,7 +53,7 @@ export const serve = (ahub, verbose, options) => normalizeConfig(options)
 .then(({ src, dest, sitemap, indexJson, watch, favicons, ignored }) =>
   remove(dest)
   .then(() => ahub(src, dest, { sitemap, indexJson, watch, favicons, ignored, verbose }))
-  .then(watcher => browsersync.create().init({ server: dest, watch: true }))
+  .then(watcher => browsersync.create().init({ server: dest, watch: true, notify: false }))
 )
 
 export const create = (path, isIndex, hub) => {
