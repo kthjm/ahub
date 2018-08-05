@@ -4,9 +4,43 @@ import { outputFile } from 'fs-extra'
 import { join as pathJoin, resolve as pathResolve, sep as pathSep } from 'path'
 import buildFavicons from './buildFavicons.js'
 import buildPages from './buildPages.js'
-import plugin from './plugin.js'
+import j2h from './chin-plugin-json-to-html.js'
 import Html from './Html/index.js'
 import { asserts } from './util.js'
+
+const ahub = (
+  src,
+  dest,
+  { favicons, verbose, sitemap, indexJson, watch: chokidarOpts, ignored: userIgnored } = {}
+) =>
+Promise.resolve()
+.then(() => {
+  asserts(src, `${src} is invalid as src`)
+  asserts(dest, `${dest} is invalid as dest`)
+})
+.then(() =>
+  !favicons
+  ? ''
+  : buildFavicons(src, dest, favicons)
+)
+.then(faviconsHtml => {
+  const template = (props, pathname) => render(<Html {...props} {...{ pathname, indexJson, faviconsHtml }} />)
+  const json2html = j2h(template, { sitemap })
+  return buildPages({
+    put: src,
+    out: dest,
+    verbose,
+    processors: { json: json2html },
+    userIgnored,
+    chokidarOpts
+  })
+  .then(watcher => ({ watcher, sitemaps: json2html.sitemaps() }))
+})
+.then(({ watcher, sitemaps }) =>
+  !sitemaps
+  ? watcher
+  : buildSitemap(dest, sitemaps).then(() => watcher)
+)
 
 const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
   Promise.all([
@@ -16,70 +50,4 @@ const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
     outputFile(pathJoin(dest, filename), string)
   ))
 
-const ahub = (src, dest, options = {}) => Promise.resolve().then(() => {
-
-  asserts(src, `${src} is invalid as src`)
-  asserts(dest, `${dest} is invalid as dest`)
-
-  return Promise.resolve()
-  .then(() =>
-    options.favicons
-    ? buildFavicons(src, dest, options.favicons)
-    : ''
-  )
-  .then(faviconsHtml => {
-    const {
-      verbose,
-      sitemap,
-      indexJson,
-      watch: chokidarOpts,
-      ignored: userIgnored,
-    } = options
-
-    const template = (props, pathname) => render(
-      <Html
-        {...props}
-        {...{ pathname, indexJson, faviconsHtml }}
-      />
-    )
-
-    const json2html = plugin(template, { sitemap })
-
-    return buildPages({
-      put: src,
-      out: dest,
-      verbose,
-      processors: { json: json2html },
-      userIgnored,
-      chokidarOpts
-    })
-    .then(watcher => ({
-      watcher,
-      sitemaps: json2html.sitemaps()
-    }))
-  })
-  .then(({ sitemaps, watcher }) =>
-    !sitemaps
-    ? watcher
-    : buildSitemap(dest, sitemaps).then(() => watcher)
-  )
-})
-
 export default ahub
-
-/*
-const isChildDir = (src) =>
-  pathResolve(src).split(pathSep).length > process.cwd().split(pathSep).length
-asserts(isChildDir(src), `${src} is invalid src`)
-
-
-.then(watcher =>
-  buildApps(dest, verbose).then(() => watcher)
-)
-const buildApps = (dest, verbose) =>
-  chin({
-    put: pathJoin(__dirname, '../app.dist'),
-    out: dest,
-    verbose
-  })
-*/

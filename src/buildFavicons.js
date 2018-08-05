@@ -3,6 +3,7 @@ import { pathExists, outputFile } from 'fs-extra'
 import { join as pathJoin } from 'path'
 
 const favname = 'favicons'
+const favpath = `/_${favname}`
 
 const files = [
   'svg',
@@ -21,17 +22,15 @@ export default (put, out, config) =>
     sources
     .find(src => typeof src === 'string')
   )
-  .then(src =>
-    !src
-    ? ''
-    : favicons(src, Object.assign({}, config, { path: `/${favname}` }))
+  .then(src => !src ? '' :
+    favicons(src, Object.assign({}, config, { path: favpath }))
     .then(({ html, images, files }) =>
       Promise
       .all(
         []
         .concat(images, files)
         .map(({ name, contents }) =>
-          outputFile(pathJoin(out, `/${favname}/${name}`), contents)
+          outputFile(pathJoin(out, favpath, name), contents)
         )
       )
       .then(() =>

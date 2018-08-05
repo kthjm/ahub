@@ -5,72 +5,114 @@ function _interopDefault(ex) {
   return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex
 }
 
+var url = require('url')
 var fsExtra = require('fs-extra')
-var path = require('path')
 var browsersync = _interopDefault(require('browser-sync'))
+var path = require('path')
 var program = _interopDefault(require('commander'))
 var ahub = _interopDefault(require('..'))
-
-const SRC = '.'
-const DEST = '.site'
-const CONFIG = 'ahub.json'
 
 const throws = message => {
   throw new Error(message)
 }
 
-const space = '\t'
+const createConfig = (src, dest = '') => ({
+  src,
+  dest,
+  sitemap: {
+    hostname: 'https://foo.bar'
+  },
+  favicons: {
+    appName: '',
+    appDescription: ''
+  },
+  watch: {},
+  ignored: []
+})
 
-var create = names =>
-  Promise.all(
-    names.map(name => {
-      const outpath = path.normalize(
-        path.extname(name) === '.json' ? name : `${name}.json`
-      )
-      const splited = outpath.split(path.sep)
-      const json =
-        splited[splited.length - 1] === 'index.json' ? indexJson : inheritJson
-      return fsExtra.outputFile(outpath, JSON.stringify(json, null, space))
-    })
-  )
+const createPage = (isIndex, embed) =>
+  !isIndex
+    ? {
+        inherit: true,
+        body: bodyUnique(embed)
+      }
+    : {
+        lang: '',
+        inherit: false,
+        head: {
+          title: '',
+          og: true,
+          ga: '',
+          tags: []
+        },
+        body: Object.assign(
+          { background: 'silver', color: '#ffffff' },
+          bodyUnique(embed)
+        )
+      }
 
-const body = {
-  background: '',
+const bodyUnique = ({ title, hub1, hub2 } = {}) => ({
   header: {
-    color: '',
-    avatar: '',
-    title: '',
-    description: ''
+    image:
+      'https://imgplaceholder.com/420x420/f3f3f3/c0c0c0/glyphicon-user?text=ahub&font-size=200',
+    title: title || '{ title }',
+    description: '{ description }'
   },
-  links: [
-    {
-      href: '',
-      src: '',
-      hub: ''
-    }
-  ]
-}
+  links: !hub1
+    ? [link()]
+    : [
+        link({ title: 'title' }),
+        link({ hub: hub1 }),
+        link({ title: 'title', hub: hub2 || hub1 })
+      ]
+})
 
-const indexJson = {
+const link = ({ title = '', hub = '' } = {}) => ({
+  title: title,
+  href: 'https://github.com/',
+  image: 'https://image.flaticon.com/icons/svg/25/25231.svg',
+  hub: hub && url.resolve('/', hub)
+})
+
+/*
+
+{
+  inherit: boolean,
   lang: '',
   head: {
     title: '',
-    og: true,
+    og: boolean,
     ga: '',
-    tags: []
+    tags: [
+      ['tag', attribs, 'text']
+    ]
   },
-  body
+  body: {
+    background: '',
+    color: '',
+    header: {
+      image: '',
+      title: '',
+      description: ''
+    },
+    links: [
+      {
+        title: '',
+        href: '',
+        image: '',
+        hub: ''
+      }
+    ]
+  }
 }
 
-const inheritJson = {
-  lang: '',
-  head: {
-    inherit: true
-  },
-  body
-}
+*/
 
-var normalizeConfig = (src, dest, configPath, isWatch, isPro) =>
+const SRC = '.'
+const DEST = '_site'
+const CONFIG = '_config.json'
+
+const normalizeConfig = ({ src, dest, configPath, isWatch, isProduct }) =>
   Promise.resolve()
     .then(
       () =>
@@ -87,9 +129,8 @@ var normalizeConfig = (src, dest, configPath, isWatch, isPro) =>
     .then(config => ({
       src: src || config.src || SRC,
       dest: dest || config.dest || DEST,
-      sitemap: isPro ? config.sitemap : undefined,
-      // hostname:  isPro ? config.hostname : undefined,
-      favicons: isPro ? config.favicons || true : undefined,
+      sitemap: isProduct ? config.sitemap : undefined,
+      favicons: isProduct ? config.favicons || true : undefined,
       watch: isWatch ? config.watch || true : undefined,
       ignored: config.ignored,
       indexJson: undefined
@@ -101,42 +142,97 @@ var normalizeConfig = (src, dest, configPath, isWatch, isPro) =>
         .catch(() => throws(`[src]/index.json is required`))
     )
 
-var serve = (ahub$$1, src, dest, { configPath, isWatch, verbose }) =>
-  normalizeConfig(src, dest, configPath, isWatch, false).then(
-    ({ src, dest, lang, sitemap, head, watch, favicons, ignored }) =>
-      fsExtra.remove(dest).then(() =>
-        ahub$$1(src, dest, {
-          lang,
-          sitemap,
-          head,
-          watch,
-          favicons,
-          ignored,
-          verbose
-        }).then(watcher =>
-          browsersync.create().init({
-            server: dest,
-            watch: true
+const build = (ahub$$1, verbose, options) =>
+  normalizeConfig(options).then(
+    ({ src, dest, sitemap, indexJson, watch, favicons, ignored }) =>
+      fsExtra
+        .remove(dest)
+        .then(() =>
+          ahub$$1(src, dest, {
+            sitemap,
+            indexJson,
+            watch,
+            favicons,
+            ignored,
+            verbose
           })
         )
-      )
   )
 
-var build = (ahub$$1, src, dest, { configPath, isPro, verbose }) =>
-  normalizeConfig(src, dest, configPath, false, isPro).then(
-    ({ src, dest, lang, sitemap, head, watch, favicons, ignored }) =>
-      fsExtra.remove(dest).then(() =>
-        ahub$$1(src, dest, {
-          lang,
-          sitemap,
-          head,
-          watch,
-          favicons,
-          ignored,
-          verbose
-        })
-      )
+const serve = (ahub$$1, verbose, options) =>
+  normalizeConfig(options).then(
+    ({ src, dest, sitemap, indexJson, watch, favicons, ignored }) =>
+      fsExtra
+        .remove(dest)
+        .then(() =>
+          ahub$$1(src, dest, {
+            sitemap,
+            indexJson,
+            watch,
+            favicons,
+            ignored,
+            verbose
+          })
+        )
+        .then(watcher =>
+          browsersync.create().init({ server: dest, watch: true })
+        )
   )
+
+const create = (path$$1, isIndex, hub) => {
+  path$$1 = path.extname(path$$1) !== '.json' ? `${path$$1}.json` : path$$1
+  return fsExtra.outputFile(
+    path.normalize(path$$1),
+    jtringify(
+      createPage(isIndex, {
+        title: filename(path$$1),
+        hub1: !hub
+          ? undefined
+          : path.extname(hub) === '.json'
+            ? thinext(filename(hub))
+            : filename(hub)
+      })
+    )
+  )
+}
+
+const init = (src, dest) =>
+  Promise.all(
+    [
+      [CONFIG, jtringify(createConfig(src, dest))],
+      [
+        path.join(src, 'index.json'),
+        jtringify(
+          createPage(true, {
+            title: 'index.json',
+            hub1: 'path1',
+            hub2: 'path2'
+          })
+        )
+      ],
+      [
+        path.join(src, 'path1.json'),
+        jtringify(createPage(false, { title: 'path1.json', hub1: 'path2' }))
+      ],
+      [
+        path.join(src, 'path2.json'),
+        jtringify(createPage(false, { title: 'path2.json', hub1: 'path1' }))
+      ]
+    ].map(arg => fsExtra.outputFile(...arg))
+  )
+
+const jtringify = obj => JSON.stringify(obj, null, '\t')
+
+const filename = path$$1 => {
+  const splited = path.normalize(path$$1).split(path.sep)
+  return splited[splited.length - 1]
+}
+
+const thinext = filename => {
+  const splited = filename.split('.')
+  splited.pop()
+  return splited.join('.')
+}
 
 const errorHandler = err => {
   console.error(err)
@@ -154,11 +250,30 @@ program
   .version(require('../package.json').version, '-v, --version')
 
 program
-  .command('create [name...]')
-  .usage(`[name...] [options]`)
+  .command('init <src> [dest]')
+  .usage(`<src> [dest]`)
   .on('--help', () => console.log(``))
-  .action((names, {}) =>
-    create(names.length ? names : ['index.json']).catch(errorHandler)
+  .action((src, dest) => init(src, dest).catch(errorHandler))
+
+program
+  .command('create <path...>')
+  .usage(`<path...> [options]`)
+  .option('-i, --index', '')
+  .on('--help', () => console.log(``))
+  .action((paths, { index: isIndex }) =>
+    Promise.all(
+      paths
+        .map(
+          path$$1 => (path$$1.includes(',') ? path$$1.split(',') : [path$$1])
+        )
+        .reduce((a, c) => a.concat(c), [])
+        .map(
+          (path$$1, index, paths) =>
+            !isIndex && paths.length > 1
+              ? create(path$$1, false, paths[index + 1] || paths[0])
+              : create(path$$1, isIndex)
+        )
+    ).catch(errorHandler)
   )
 
 program
@@ -171,10 +286,11 @@ program
   .option('-q, --quiet', 'without log')
   .on('--help', () => console.log(``))
   .action((src, dest, { config, quiet }) =>
-    serve(ahub, src, dest, {
+    serve(ahub, !quiet, {
+      src,
+      dest,
       configPath: config,
-      isWatch: true,
-      verbose: !quiet
+      isWatch: true
     }).catch(errorHandler)
   )
 
@@ -185,19 +301,17 @@ program
     `-c, --config <jsonfile>`,
     `default: '${CONFIG}' || packagejson['ahub']`
   )
-  .option('-p, --product', 'build as production')
   .option('-q, --quiet', 'without log')
   .on('--help', () => console.log(``))
-  .action((src, dest, { config, product, quiet }) =>
-    build(ahub, src, dest, {
+  .action((src, dest, { config, quiet }) =>
+    build(ahub, !quiet, {
+      src,
+      dest,
       configPath: config,
-      isPro: product,
-      verbose: !quiet
+      isProduct: true
     }).catch(errorHandler)
   )
 
 program.parse(process.argv)
 
-program.args.length === 0 &&
-  // program.emit(`command:*`, program.args)
-  program.help()
+program.args.length === 0 && program.help()

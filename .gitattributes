@@ -1,0 +1,15 @@
+# directories
+src export-ignore
+
+# git files
+.gitattributes export-ignore
+.gitignore export-ignore
+
+# files
+.babelrc export-ignore
+README.md export-ignore
+*.yml export-ignore
+*.config.js export-ignore
+script.*.js export-ignore
+test.js export-ignore
+yarn.lock export-ignore

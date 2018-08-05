@@ -7,36 +7,64 @@ import Body from './Body.js'
 export default (props) => <Html {...normalizeProps(props)} />
 
 const Html = ({ pathname, lang, head, body }) =>
-<html {...{ lang }}>
+<html lang={!lang ? undefined : lang}>
   <Head {...head} />
   <Body {...body} {...{ pathname }} />
 </html>
 
 const normalizeProps = ({
+  inherit,
   lang,
-  head: { inherit, title, og, ga, tags } = {},
-  body = {},
+  head,
+  body,
   pathname,
   indexJson = {},
   faviconsHtml = ''
 }) => ({
   pathname,
-  lang: lang || indexJson.lang,
-  head: !inherit
-  ? {
-    title,
-    og,
-    ga,
-    embed: h2r(tags2markup(tags) + faviconsHtml)
-  }
-  : {
-    title: title || indexJson.head.title,
-    og:    og    || indexJson.head.og,
-    ga:    ga    || indexJson.head.ga,
-    embed: h2r((tags2markup(tags) || tags2markup(indexJson.head.tags)) + faviconsHtml)
-  },
-  body
+  lang: !inherit ? lang : lang || indexJson.lang,
+  head: normalizeHead(inherit, indexJson.head, head, faviconsHtml),
+  body: normalizeBody(inherit, indexJson.body, body)
 })
+
+const normalizeHead = (
+  inherit,
+  indexHead = {},
+  { title, og, ga, tags } = {},
+  faviconsHtml
+) =>
+!inherit
+? {
+  title,
+  og,
+  ga,
+  embed: h2r(tags2markup(tags) + faviconsHtml)
+}
+: {
+  title: title || indexHead.title,
+  og:    og    || indexHead.og,
+  ga:    ga    || indexHead.ga,
+  embed: h2r((tags2markup(tags) || tags2markup(indexHead.tags)) + faviconsHtml)
+}
+
+const normalizeBody = (
+  inherit,
+  { background: indexBackground, color: indexColor } = {},
+  { background, color, header, links } = {}
+) =>
+!inherit
+? {
+  background,
+  color,
+  header,
+  links
+}
+: {
+  background: background || indexBackground,
+  color:      color      || indexColor,
+  header,
+  links
+}
 
 const tags2markup = (tags) =>
   !Array.isArray(tags)

@@ -5,7 +5,7 @@ const ogPrefix = 'og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http:/
 const Ga = ({ id }) => <script></script>
 
 export default ({ title, og, ga, embed }) =>
-<head prefix={!og ? '' : ogPrefix}>
+<head prefix={!og ? undefined : ogPrefix}>
   {title && <title>{title}</title>}
   {embed}
   {ga && <Ga id={ga} />}

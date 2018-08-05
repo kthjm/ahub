@@ -1,24 +1,30 @@
 import React from 'react'
 import Atra from 'atra'
 
-export default ({ color, avatar, name, description }) =>
-<header {...a('HEADER', { style: { color } })}>
-  <div {...a('')}><img {...a('AVATAR', { src: avatar })} /></div>
-  <h1 {...a('')}>{name}</h1>
-  <p {...a('')}>{description}</p>
+export default ({ image, title, description }) =>
+<header {...a('HEADER')}>
+  {image && <div><div {...a('IMAGE', { style: { backgroundImage: `url(${image})` } })} /></div>}
+  {title && <h1>{title}</h1>}
+  {description && <p>{description}</p>}
 </header>
 
 const a = Atra({
   HEADER: {
     style: {
-      padding: '60px 0px 30px',
+      padding: '30px 0px',
       textAlign: 'center'
     }
   },
-  AVATAR: {
+  IMAGE: {
     style: {
+      display: 'inline-block',
       width: 110,
-      height: 110
+      height: 110,
+      borderRadius: 3,
+      backgroundImage: undefined,
+      backgroundSize: 'contain',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
     }
   }
 })

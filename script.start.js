@@ -1,6 +1,8 @@
 process.env.BABEL_ENV = 'ENV'
 require('babel-register')
-require('./src').default('.put', '.out', {
-  watch: {},
-  verbose: true
+const ahub = require('./src').default
+ahub('.put', '.out', {
+  watch: true,
+  verbose: true,
+  indexJson: require('./.put/index.json')
 })

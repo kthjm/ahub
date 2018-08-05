@@ -3,9 +3,9 @@ import Atra from 'atra'
 
 const icon = '</>'
 
-export default ({ color }) =>
+export default () =>
 <div {...a('FIXED')}>
-  <a {...a('HREF', { style: { color } })}>
+  <a {...a('HREF')}>
     {icon}
   </a>
 </div>
@@ -21,11 +21,11 @@ const a = Atra({
   HREF: {
     href: '/',
     style: {
+      color: 'inherit',
       display: 'block',
       fontSize: '3em',
       lineHeight: 1.2,
       fontWeight: 'bold',
-      // padding: '0px 5px',
       padding: '6px 12px',
       textDecoration: 'none'
     }

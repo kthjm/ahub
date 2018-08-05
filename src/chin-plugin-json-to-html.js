@@ -10,11 +10,10 @@ export default (template, options) => {
 
   const { sitemap: sitemapOpts } = options
 
+  let sitemapCreated = false
   const sitemapUrls = []
-  let alreadyCreated = false
-
   const sitemaps = () => {
-    alreadyCreated = true
+    sitemapCreated = true
     const urls = sortUrls(sitemapUrls)
     return !urls.length ? undefined : {
       robotsTxt: createRobotsTxt(sitemapOpts.hostname),
@@ -27,12 +26,14 @@ export default (template, options) => {
     const reout = Object.assign(out, { ext: '.html' }, out.name !== 'index' && { dir: pathJoin(out.dir, out.name), name: 'index' })
     const pathname = urlResolve('', reout.dir.split(process.env.CHIN_OUT)[1] || '/')
 
-    if (sitemapOpts && !alreadyCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
+    if (sitemapOpts && !sitemapCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
 
-    return [
+    return Promise.resolve()
+    .then(() => template(props, pathname))
+    .then(html => [
       pathFormat(reout),
-      pretty('<!DOCTYPE html>' + template(props, pathname), { ocd: true })
-    ]
+      pretty('<!DOCTYPE html>' + html, { ocd: true })
+    ])
   }
 
   return { isStream, options, sitemaps, processor }
@@ -51,12 +52,7 @@ const createRobotsTxt = (hostname) =>
 `User-agent: *
 Sitemap: ${urlResolve(hostname, 'sitemap.xml')}`
 
-const createSitemapImg = ({
-  body: {
-    avatar,
-    links = []
-  } = {}
-} = {}) =>
+const createSitemapImg = ({ body: { avatar, links = [] } = {} } = {}) =>
   []
   .concat(
     [avatar],

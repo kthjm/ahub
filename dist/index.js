@@ -7,17 +7,20 @@ function _interopDefault(ex) {
 var favicons = _interopDefault(require('favicons'))
 var fsExtra = require('fs-extra')
 var path = require('path')
+var url = require('url')
+require('browser-sync')
 var chin = require('chin')
 var sitemap = require('sitemap')
 var pretty = _interopDefault(require('pretty'))
-var url = require('url')
-var React = _interopDefault(require('react'))
+var React = require('react')
+var React__default = _interopDefault(React)
 var Atra = _interopDefault(require('atra'))
 var h2r = _interopDefault(require('react-html-parser'))
 var createTag = _interopDefault(require('html-tag'))
 var server = require('react-dom/server')
 
 const favname = 'favicons'
+const favpath = `/_${favname}`
 
 const files = ['svg', 'png', 'jpg', 'jpeg'].map(ext => `${favname}.${ext}`)
 
@@ -32,24 +35,20 @@ var buildFavicons = (put, out, config) =>
       src =>
         !src
           ? ''
-          : favicons(
-              src,
-              Object.assign({}, config, { path: `/${favname}` })
-            ).then(({ html, images, files }) =>
-              Promise.all(
-                []
-                  .concat(images, files)
-                  .map(({ name, contents }) =>
-                    fsExtra.outputFile(
-                      path.join(out, `/${favname}/${name}`),
-                      contents
+          : favicons(src, Object.assign({}, config, { path: favpath })).then(
+              ({ html, images, files }) =>
+                Promise.all(
+                  []
+                    .concat(images, files)
+                    .map(({ name, contents }) =>
+                      fsExtra.outputFile(
+                        path.join(out, favpath, name),
+                        contents
+                      )
                     )
-                  )
-              ).then(() => html.join(''))
+                ).then(() => html.join(''))
             )
     )
-
-const CONFIG = 'ahub.json'
 
 const throws = message => {
   throw new Error(message)
@@ -64,6 +63,42 @@ const arr2nesty = (array, length) =>
         : a[a.length - 1].push(c)) && a,
     [[]]
   )
+
+/*
+
+{
+  inherit: boolean,
+  lang: '',
+  head: {
+    title: '',
+    og: boolean,
+    ga: '',
+    tags: [
+      ['tag', attribs, 'text']
+    ]
+  },
+  body: {
+    background: '',
+    color: '',
+    header: {
+      image: '',
+      title: '',
+      description: ''
+    },
+    links: [
+      {
+        title: '',
+        href: '',
+        image: '',
+        hub: ''
+      }
+    ]
+  }
+}
+
+*/
+
+const CONFIG = '_config.json'
 
 const defaultIgnored = [
   CONFIG,
@@ -91,7 +126,7 @@ var buildPages = ({
   userIgnored,
   chokidarOpts
 }) => {
-  const build = chin[chokidarOpts ? 'watch' : 'chin']
+  const build$$1 = chin[chokidarOpts ? 'watch' : 'chin']
 
   const ignored = [].concat(
     defaultIgnored,
@@ -101,19 +136,18 @@ var buildPages = ({
 
   const watch = Object.assign({ ignored, ignoreInitial: true }, chokidarOpts)
 
-  return build({ put, out, verbose, processors, ignored, watch })
+  return build$$1({ put, out, verbose, processors, ignored, watch })
 }
 
 const isStream = false
 
-var plugin = (template, options) => {
+var j2h = (template, options) => {
   const { sitemap: sitemapOpts } = options
 
+  let sitemapCreated = false
   const sitemapUrls = []
-  let alreadyCreated = false
-
   const sitemaps = () => {
-    alreadyCreated = true
+    sitemapCreated = true
     const urls = sortUrls(sitemapUrls)
     return !urls.length
       ? undefined
@@ -142,13 +176,15 @@ var plugin = (template, options) => {
       reout.dir.split(process.env.CHIN_OUT)[1] || '/'
     )
 
-    if (sitemapOpts && !alreadyCreated)
+    if (sitemapOpts && !sitemapCreated)
       sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
 
-    return [
-      path.format(reout),
-      pretty('<!DOCTYPE html>' + template(props, pathname), { ocd: true })
-    ]
+    return Promise.resolve()
+      .then(() => template(props, pathname))
+      .then(html => [
+        path.format(reout),
+        pretty('<!DOCTYPE html>' + html, { ocd: true })
+      ])
   }
 
   return { isStream, options, sitemaps, processor }
@@ -174,138 +210,27 @@ const createSitemapImg = ({ body: { avatar, links = [] } = {} } = {}) =>
 const ogPrefix =
   'og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#'
 
-const Ga = ({ id }) => React.createElement('script', null)
+const Ga = ({ id }) => React__default.createElement('script', null)
 
 var Head = ({ title, og, ga, embed }) =>
-  React.createElement(
+  React__default.createElement(
     'head',
-    { prefix: !og ? '' : ogPrefix },
-    title && React.createElement('title', null, title),
+    { prefix: !og ? undefined : ogPrefix },
+    title && React__default.createElement('title', null, title),
     embed,
-    ga && React.createElement(Ga, { id: ga })
+    ga && React__default.createElement(Ga, { id: ga })
   )
-
-var Header = ({ color, avatar, name, description }) =>
-  React.createElement(
-    'header',
-    a('HEADER', { style: { color } }),
-    React.createElement(
-      'div',
-      a(''),
-      React.createElement('img', a('AVATAR', { src: avatar }))
-    ),
-    React.createElement('h1', a(''), name),
-    React.createElement('p', a(''), description)
-  )
-
-const a = Atra({
-  HEADER: {
-    style: {
-      padding: '60px 0px 30px',
-      textAlign: 'center'
-    }
-  },
-  AVATAR: {
-    style: {
-      width: 110,
-      height: 110
-    }
-  }
-})
-
-var Block = (a => ({ width, height, margin, children }) =>
-  React.createElement(
-    'div',
-    a('BLOCK', { style: { width, height, margin } }),
-    children
-  ))(
-  Atra({
-    BLOCK: {
-      style: {
-        borderRadius: 3,
-        padding: 20,
-        // backgroundColor: '#F1F3F1'
-        backgroundColor: '#f7f7f7'
-      }
-    }
-  })
-)
-
-const HrefImage = (a => ({ href, src }) =>
-  React.createElement(
-    'a',
-    a('HREF', { href }),
-    React.createElement(
-      'div',
-      a('IMAGE', { style: { backgroundImage: `url(${src})` } })
-    )
-  ))(
-  Atra({
-    HREF: {
-      target: '_blank',
-      style: {
-        display: 'block',
-        maxWidth: 120,
-        height: '70%',
-        margin: '7px auto 22px'
-      }
-    },
-    IMAGE: {
-      style: {
-        height: '100%',
-        backgroundSize: 'contain',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }
-    }
-  })
-)
-
-const HrefHub = (a => ({ href, color }) =>
-  React.createElement(
-    'div',
-    a('WRAP'),
-    React.createElement('a', a('HREF', { href, style: { color } }), '< hub >')
-  ))(
-  Atra({
-    WRAP: {
-      style: {
-        textAlign: 'center'
-      }
-    },
-    HREF: {
-      style: {
-        textDecoration: 'none',
-        color: '#a9a9a9',
-        // color: '#424242',
-        fontWeight: 'bold'
-      }
-    }
-  })
-)
-
-var Supple = ({ height, margin, flexLength, blankLength }) =>
-  React.createElement('div', {
-    style: {
-      height,
-      width: `${(1 / flexLength) * 100 * blankLength}%`,
-      padding: `20px ${20 * blankLength}px`,
-      // margin: `0px ${margin * blankLength}px ${margin}px 0px`
-      margin: `0px ${margin * blankLength}px ${margin}px ${margin *
-        blankLength}px`
-    }
-  })
 
 const icon = '</>'
 
-var ToRoot = ({ color }) =>
-  React.createElement(
+var ToRoot = () =>
+  React__default.createElement(
     'div',
-    a$1('FIXED'),
-    React.createElement('a', a$1('HREF', { style: { color } }), icon)
+    a('FIXED'),
+    React__default.createElement('a', a('HREF'), icon)
   )
 
-const a$1 = Atra({
+const a = Atra({
   FIXED: {
     style: {
       position: 'fixed',
@@ -316,16 +241,65 @@ const a$1 = Atra({
   HREF: {
     href: '/',
     style: {
+      color: 'inherit',
       display: 'block',
       fontSize: '3em',
       lineHeight: 1.2,
       fontWeight: 'bold',
-      // padding: '0px 5px',
       padding: '6px 12px',
       textDecoration: 'none'
     }
   }
 })
+
+var Header = ({ image, title, description }) =>
+  React__default.createElement(
+    'header',
+    a$1('HEADER'),
+    image &&
+      React__default.createElement(
+        'div',
+        null,
+        React__default.createElement(
+          'div',
+          a$1('IMAGE', { style: { backgroundImage: `url(${image})` } })
+        )
+      ),
+    title && React__default.createElement('h1', null, title),
+    description && React__default.createElement('p', null, description)
+  )
+
+const a$1 = Atra({
+  HEADER: {
+    style: {
+      padding: '30px 0px',
+      textAlign: 'center'
+    }
+  },
+  IMAGE: {
+    style: {
+      display: 'inline-block',
+      width: 110,
+      height: 110,
+      borderRadius: 3,
+      backgroundImage: undefined,
+      backgroundSize: 'contain',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }
+  }
+})
+
+const Hidden = ({ type, attributes = {} }) =>
+  React.createElement(
+    type || 'div',
+    Object.assign({}, attributes, {
+      style: Object.assign({}, attributes.style, {
+        visibility: 'hidden'
+      })
+    }),
+    '.'
+  )
 
 var _extends =
   Object.assign ||
@@ -344,95 +318,218 @@ var _extends =
   }
 
 const LENGTH = 3
-const BLOCK_HEIGHT = 190
 const BLOCK_MARGIN = 4
 
-var Body = (a => ({ pathname, background, header = {}, links = [] }) =>
-  React.createElement(
-    'body',
-    a('BODY', { style: { background } }),
-    pathname !== '/' &&
-      React.createElement(ToRoot, { color: header.color || 'inherit' }),
-    React.createElement(
-      'main',
-      a('WIDTH'),
-      React.createElement(Header, header),
-      arr2nesty(links, LENGTH).map((rowLinks, rowLinksIndex) =>
-        React.createElement(
-          'div',
-          { key: rowLinksIndex, style: { display: 'flex' } },
-          rowLinks.map(({ href, src, hub }, linkIndex) =>
-            React.createElement(
-              Block,
-              _extends(
-                { key: linkIndex },
-                {
-                  width: (1 / LENGTH) * 100 + '%',
-                  height: BLOCK_HEIGHT,
-                  margin: BLOCK_MARGIN
-                }
-              ),
-              React.createElement(HrefImage, { href, src }),
-              hub &&
-                React.createElement(HrefHub, { href: hub, color: background })
-            )
-          ),
-          LENGTH - rowLinks.length > 0 &&
-            React.createElement(Supple, {
-              height: BLOCK_HEIGHT,
-              margin: BLOCK_MARGIN,
-              flexLength: LENGTH,
-              blankLength: LENGTH - rowLinks.length
-            })
-        )
+const Links = ({ links }) =>
+  React__default.createElement(
+    'div',
+    { style: { color: '#b7b7b7' } },
+    arr2nesty(links, LENGTH).map((rowLinks, rowLinksIndex) =>
+      React__default.createElement(
+        'div',
+        { key: rowLinksIndex, style: { display: 'flex' } },
+        rowLinks.map(({ href, image, title, hub }, linkIndex) =>
+          React__default.createElement(
+            Link,
+            _extends(
+              { key: linkIndex },
+              { width: (1 / LENGTH) * 100 + '%', margin: BLOCK_MARGIN }
+            ),
+            React__default.createElement(Title, { title }),
+            React__default.createElement(HrefImage, { href, image }),
+            React__default.createElement(HrefHub, { href: hub })
+          )
+        ),
+        LENGTH - rowLinks.length > 0 &&
+          React__default.createElement(Supple, {
+            margin: BLOCK_MARGIN,
+            flexLength: LENGTH,
+            blankLength: LENGTH - rowLinks.length
+          })
       )
     )
+  )
+
+const Link = (a => ({ width, margin, children }) =>
+  React__default.createElement(
+    'div',
+    a('LINK', {
+      style: { width, margin },
+      children
+    })
   ))(
   Atra({
-    BODY: {
+    LINK: {
       style: {
-        margin: 0,
-        fontFamily:
-          'Cousine,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif',
-        letterSpacing: 0.44,
-        lineHeight: 1.76,
-        height: 'auto'
+        borderRadius: 3,
+        padding: '5px 20px 10px',
+        height: 'auto',
+        backgroundColor: '#f7f7f7'
       }
-    },
-    WIDTH: {
-      style: {
-        maxWidth: 870,
-        padding: '0px 40px',
-        margin: '0px auto 80px'
-      }
-    },
-    LINKS: {
-      style: {}
     }
   })
 )
 
-var Html = props => React.createElement(Html$1, normalizeProps(props))
+const Title = (a => ({ title }) =>
+  React__default.createElement(
+    'div',
+    a('BLOCK'),
+    !title
+      ? React__default.createElement(Hidden, {
+          type: 'span',
+          attributes: a('INLINE')
+        })
+      : React__default.createElement('span', a('INLINE'), title)
+  ))(
+  Atra({
+    BLOCK: {
+      style: {
+        textAlign: 'center',
+        fontSize: '0.85em',
+        fontWeight: 100,
+        letterSpacing: 1
+      }
+    },
+    INLINE: {
+      style: {
+        borderBottom: 'solid 1px',
+        padding: '0px 4px'
+      }
+    }
+  })
+)
+
+const HrefImage = (a => ({ href, image }) =>
+  React__default.createElement(
+    'a',
+    a('HREF', href && { href, target: '_blank' }),
+    React__default.createElement(
+      'div',
+      a('IMAGE', { style: { backgroundImage: `url(${image})` } })
+    )
+  ))(
+  Atra({
+    HREF: {
+      style: {
+        display: 'block',
+        maxWidth: 120,
+        height: 120,
+        margin: '12px auto 10px'
+      }
+    },
+    IMAGE: {
+      style: {
+        height: '100%',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }
+    }
+  })
+)
+
+const HrefHub = (a => ({ href }) =>
+  !href
+    ? React__default.createElement(Hidden, { type: 'div' })
+    : React__default.createElement(
+        'div',
+        a('WRAP'),
+        React__default.createElement('a', a('HREF', { href }), '< hub >')
+      ))(
+  Atra({
+    WRAP: {
+      style: {
+        textAlign: 'center'
+      }
+    },
+    HREF: {
+      style: {
+        textDecoration: 'none',
+        color: 'inherit',
+        fontWeight: 'bold'
+      }
+    }
+  })
+)
+
+const Supple = ({ margin, flexLength, blankLength }) =>
+  React__default.createElement('div', {
+    style: {
+      width: `${(1 / flexLength) * 100 * blankLength}%`,
+      padding: `20px ${20 * blankLength}px`,
+      margin: `0px ${margin * blankLength}px ${margin}px ${margin *
+        blankLength}px`
+    }
+  })
+
+const Body = ({ pathname, background, color, header = {}, links = [] }) =>
+  React__default.createElement(
+    'body',
+    a$2('BODY', { style: { background, color } }),
+    pathname !== '/' && React__default.createElement(ToRoot, null),
+    React__default.createElement(
+      'main',
+      a$2('WIDTH'),
+      React__default.createElement(Header, header),
+      React__default.createElement(Links, { links })
+    )
+  )
+
+const a$2 = Atra({
+  BODY: {
+    style: {
+      margin: 0,
+      fontFamily:
+        'Cousine,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif',
+      letterSpacing: 0.44,
+      lineHeight: 1.76,
+      height: 'auto'
+    }
+  },
+  WIDTH: {
+    style: {
+      maxWidth: 870,
+      padding: '0px 40px',
+      margin: '0px auto 80px'
+    }
+  },
+  LINKS: {
+    style: {}
+  }
+})
+
+var Html = props => React__default.createElement(Html$1, normalizeProps(props))
 
 const Html$1 = ({ pathname, lang, head, body }) =>
-  React.createElement(
+  React__default.createElement(
     'html',
-    { lang },
-    React.createElement(Head, head),
-    React.createElement(Body, _extends({}, body, { pathname }))
+    { lang: !lang ? undefined : lang },
+    React__default.createElement(Head, head),
+    React__default.createElement(Body, _extends({}, body, { pathname }))
   )
 
 const normalizeProps = ({
+  inherit,
   lang,
-  head: { inherit, title, og, ga, tags } = {},
-  body = {},
+  head,
+  body,
   pathname,
   indexJson = {},
   faviconsHtml = ''
 }) => ({
   pathname,
-  lang: lang || indexJson.lang,
-  head: !inherit
+  lang: !inherit ? lang : lang || indexJson.lang,
+  head: normalizeHead(inherit, indexJson.head, head, faviconsHtml),
+  body: normalizeBody(inherit, indexJson.body, body)
+})
+
+const normalizeHead = (
+  inherit,
+  indexHead = {},
+  { title, og, ga, tags } = {},
+  faviconsHtml
+) =>
+  !inherit
     ? {
         title,
         og,
@@ -440,15 +537,32 @@ const normalizeProps = ({
         embed: h2r(tags2markup(tags) + faviconsHtml)
       }
     : {
-        title: title || indexJson.head.title,
-        og: og || indexJson.head.og,
-        ga: ga || indexJson.head.ga,
+        title: title || indexHead.title,
+        og: og || indexHead.og,
+        ga: ga || indexHead.ga,
         embed: h2r(
-          (tags2markup(tags) || tags2markup(indexJson.head.tags)) + faviconsHtml
+          (tags2markup(tags) || tags2markup(indexHead.tags)) + faviconsHtml
         )
-      },
-  body
-})
+      }
+
+const normalizeBody = (
+  inherit,
+  { background: indexBackground, color: indexColor } = {},
+  { background, color, header, links } = {}
+) =>
+  !inherit
+    ? {
+        background,
+        color,
+        header,
+        links
+      }
+    : {
+        background: background || indexBackground,
+        color: color || indexColor,
+        header,
+        links
+      }
 
 const tags2markup = tags =>
   !Array.isArray(tags)
@@ -458,6 +572,47 @@ const tags2markup = tags =>
         .map(arg => createTag(...arg))
         .join('')
 
+const ahub = (
+  src,
+  dest,
+  {
+    favicons: favicons$$1,
+    verbose,
+    sitemap: sitemap$$1,
+    indexJson,
+    watch: chokidarOpts,
+    ignored: userIgnored
+  } = {}
+) =>
+  Promise.resolve()
+    .then(() => {
+      asserts(src, `${src} is invalid as src`)
+      asserts(dest, `${dest} is invalid as dest`)
+    })
+    .then(() => (!favicons$$1 ? '' : buildFavicons(src, dest, favicons$$1)))
+    .then(faviconsHtml => {
+      const template = (props, pathname) =>
+        server.renderToStaticMarkup(
+          React__default.createElement(
+            Html,
+            _extends({}, props, { pathname, indexJson, faviconsHtml })
+          )
+        )
+      const json2html = j2h(template, { sitemap: sitemap$$1 })
+      return buildPages({
+        put: src,
+        out: dest,
+        verbose,
+        processors: { json: json2html },
+        userIgnored,
+        chokidarOpts
+      }).then(watcher => ({ watcher, sitemaps: json2html.sitemaps() }))
+    })
+    .then(
+      ({ watcher, sitemaps }) =>
+        !sitemaps ? watcher : buildSitemap(dest, sitemaps).then(() => watcher)
+    )
+
 const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
   Promise.all(
     [['sitemap.xml', sitemapXml], ['robots.txt', robotsTxt]].map(
@@ -465,52 +620,5 @@ const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
         fsExtra.outputFile(path.join(dest, filename), string)
     )
   )
-
-const ahub = (src, dest, options = {}) =>
-  Promise.resolve().then(() => {
-    asserts(src, `${src} is invalid as src`)
-    asserts(dest, `${dest} is invalid as dest`)
-
-    return Promise.resolve()
-      .then(
-        () =>
-          options.favicons ? buildFavicons(src, dest, options.favicons) : ''
-      )
-      .then(faviconsHtml => {
-        const {
-          verbose,
-          sitemap: sitemap$$1,
-          indexJson,
-          watch: chokidarOpts,
-          ignored: userIgnored
-        } = options
-
-        const template = (props, pathname) =>
-          server.renderToStaticMarkup(
-            React.createElement(
-              Html,
-              _extends({}, props, { pathname, indexJson, faviconsHtml })
-            )
-          )
-
-        const json2html = plugin(template, { sitemap: sitemap$$1 })
-
-        return buildPages({
-          put: src,
-          out: dest,
-          verbose,
-          processors: { json: json2html },
-          userIgnored,
-          chokidarOpts
-        }).then(watcher => ({
-          watcher,
-          sitemaps: json2html.sitemaps()
-        }))
-      })
-      .then(
-        ({ sitemaps, watcher }) =>
-          !sitemaps ? watcher : buildSitemap(dest, sitemaps).then(() => watcher)
-      )
-  })
 
 module.exports = ahub
