@@ -1,16 +1,14 @@
 import { pathExists, outputFile } from 'fs-extra'
 import { join as pathJoin } from 'path'
 import { throws } from './util.js'
-
-const favname = 'favicons'
-const favpath = `/_${favname}`
+import { FAVICONS } from './variables.js'
 
 const files = [
   'svg',
   'png',
   'jpg',
   'jpeg'
-].map(ext => `${favname}.${ext}`)
+].map(ext => `${FAVICONS}.${ext}`)
 
 export default (put, out, config) =>
   Promise.all(
@@ -24,7 +22,7 @@ export default (put, out, config) =>
   )
   .then(src => !src ? '' : require('favicons')(
       src,
-      Object.assign({}, config, { path: favpath })
+      Object.assign({}, config, { path: `/${FAVICONS}` })
     )
     .then(({ html, images, files }) =>
       Promise
@@ -32,7 +30,7 @@ export default (put, out, config) =>
         []
         .concat(images, files)
         .map(({ name, contents }) =>
-          outputFile(pathJoin(out, favpath, name), contents)
+          outputFile(pathJoin(out, FAVICONS, name), contents)
         )
       )
       .then(() =>
