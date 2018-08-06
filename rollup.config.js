@@ -17,8 +17,7 @@ const plugins = [
   }),
   resolve({
     jsnext: true,
-    main: true,
-    jail: './src'
+    main: true
   }),
   commonjs(),
   autoExternal({
@@ -36,18 +35,12 @@ export default [
   {
     plugins,
     input: 'src/index.js',
-    output: [
-      { format: 'cjs', file: 'dist/cjs.js' },
-      { format: 'es', file: 'dist/es.js' }
-    ]
+    output: { format: 'cjs', file: 'dist/index.js' }
   },
   {
     plugins,
     input: 'src/Html/index.js',
-    output: [
-      { format: 'cjs', file: 'component/cjs.js' },
-      { format: 'es', file: 'component/es.js' }
-    ]
+    output: { format: 'cjs', file: 'component/index.js' }
   },
   {
     plugins,
@@ -55,7 +48,7 @@ export default [
     output: { format: 'cjs', file: 'bin/ahub.js', banner: shebang },
     external: [
       '..',
-      path.resolve('./component'),
+      path.resolve('component/index.js'),
       'react-dom/server'
     ]
   }

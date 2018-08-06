@@ -1,7 +1,7 @@
 import React from 'react'
 import { renderToStaticMarkup as render } from 'react-dom/server'
 import { pathExists, readJson, remove, outputFile } from 'fs-extra'
-import browsersync from 'browser-sync'
+import bs from 'browser-sync'
 import { join, parse, extname, normalize, sep } from 'path'
 import { throws } from './util.js'
 import { createConfig, createPage } from './_json.js'
@@ -24,17 +24,18 @@ export const getConfig = (configPath) =>
     )
   )
 
-const normalizeConfig = ({ src, dest, Html, configPath, isWatch, isProduct }) =>
+const normalizeConfig = ({ src, dest, Html, configPath, isProduct, isWatch }) =>
   Promise.resolve()
   .then(() => getConfig(configPath))
   .then(config => ({
-    src:      src  || config.src  || SRC,
-    dest:     dest || config.dest || DEST,
-    sitemap:  isProduct ? config.sitemap          : undefined,
-    favicons: isProduct ? config.favicons || true : undefined,
-    watch:    isWatch   ? config.watch    || true : undefined,
-    ignored:  config.ignored,
-    template: undefined
+    src:         src  || config.src  || SRC,
+    dest:        dest || config.dest || DEST,
+    template:    undefined,
+    ignored:     config.ignored,
+    sitemap:     isProduct ? config.sitemap          : undefined,
+    favicons:    isProduct ? config.favicons || true : undefined,
+    chokidar:    isWatch   ? config.chokidar || true : undefined,
+    browsersync: isWatch   ? config.browsersync      : undefined
   }))
   .then(config => {
     const indexJsonPath = join(config.src, 'index.json')
@@ -45,17 +46,46 @@ const normalizeConfig = ({ src, dest, Html, configPath, isWatch, isProduct }) =>
     )
   })
 
-export const build = (ahub, verbose, options) => normalizeConfig(options)
-.then(({ src, dest, sitemap, template, watch, favicons, ignored }) =>
+export const build = (ahub, options, verbose) =>
+normalizeConfig(Object.assign({}, options, { isProduct: true }))
+.then(({ src, dest, template, sitemap, favicons, ignored }) =>
   remove(dest)
-  .then(() => ahub(src, dest, template, { sitemap, watch, favicons, ignored, verbose }))
+  .then(() =>
+    ahub(src, dest, template, {
+      favicons,
+      sitemap,
+      verbose,
+      ignored
+    })
+  )
 )
 
-export const serve = (ahub, verbose, options) => normalizeConfig(options)
-.then(({ src, dest, sitemap, template, watch, favicons, ignored }) =>
+export const serve = (ahub, options, verbose) =>
+normalizeConfig(Object.assign({}, options, { isWatch: true }))
+.then(({ src, dest, template, sitemap, favicons, ignored, chokidar, browsersync }) =>
   remove(dest)
-  .then(() => ahub(src, dest, template, { sitemap, watch, favicons, ignored, verbose }))
-  .then(watcher => browsersync.create().init({ server: dest, watch: true, notify: false }))
+  .then(() =>
+    ahub(src, dest, template, {
+      favicons,
+      sitemap,
+      verbose,
+      ignored,
+      watch: chokidar
+    })
+  )
+  .then(watcher => {
+    const instance = bs.create()
+    return new Promise(resolve =>
+      instance.init(
+        Object.assign(
+          { notify: false },
+          browsersync,
+          { server: dest, watch: true }
+        ),
+        () => resolve(instance)
+      )
+    )
+  })
 )
 
 export const create = (path, isIndex) => {
@@ -66,24 +96,12 @@ export const create = (path, isIndex) => {
   )
 }
 
-export const init = (src, dest) => Promise.all(
+export const init = (src = SRC, dest = DEST) => Promise.all(
   [
-    [
-      CONFIG,
-      jtringify(createConfig(src, dest))
-    ],
-    [
-      join(src, 'index.json'),
-      jtringify(createPage(true, { title: 'index.json', hub1: 'page1', hub2: 'page2' }))
-    ],
-    [
-      join(src, 'page1.json'),
-      jtringify(createPage(false, { title: 'page1.json', hub1: 'page2' }))
-    ],
-    [
-      join(src, 'page2.json'),
-      jtringify(createPage(false, { title: 'page2.json', hub1: 'page1' }))
-    ]
+    [CONFIG, jtringify(createConfig(src, dest))],
+    [join(src, 'index.json'), jtringify(createPage(true, { title: 'index', hub: '/page1', hub2: '/page2' }))],
+    [join(src, 'page1.json'), jtringify(createPage(false, { title: 'page1', hub: '/page2' }))],
+    [join(src, 'page2.json'), jtringify(createPage(false, { title: 'page2', hub: '/page1' }))]
   ]
   .map(arg => outputFile(...arg))
 )

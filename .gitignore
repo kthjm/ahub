@@ -1,13 +1,10 @@
-app.src/
-app.dist/
 .garbage/
 .put/
 .out/
 _config.json
-# app/
-# dist/
-# component/
-# bin/
+bin/
+dist/
+component/
 
 # Logs
 logs

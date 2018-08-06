@@ -22,8 +22,8 @@ program
 .version(require('../package.json').version, '-v, --version')
 
 program
-.command('init <src> [dest]')
-.usage(`<src> [dest]`)
+.command('init [src] [dest]')
+.usage(`[src: '${SRC}'] [dest: '${DEST}']`)
 .on('--help', () => console.log(``))
 .action((src, dest) =>
   init(src, dest)
@@ -51,14 +51,8 @@ program
 .option(`-c, --config <jsonfile>`, `default: '${CONFIG}' || packagejson['ahub']`)
 .option('-q, --quiet', 'without log')
 .on('--help', () => console.log(``))
-.action((src, dest, { config, quiet }) =>
-  serve(ahub, !quiet, {
-    src,
-    dest,
-    Html,
-    configPath: config,
-    isWatch: true
-  })
+.action((src, dest, { config: configPath, quiet }) =>
+  serve(ahub, { src, dest, Html, configPath }, !quiet)
   .catch(errorHandler)
 )
 
@@ -68,14 +62,8 @@ program
 .option(`-c, --config <jsonfile>`, `default: '${CONFIG}' || packagejson['ahub']`)
 .option('-q, --quiet', 'without log')
 .on('--help', () => console.log(``))
-.action((src, dest, { config, quiet }) =>
-  build(ahub, !quiet, {
-    src,
-    dest,
-    Html,
-    configPath: config,
-    isProduct: true
-  })
+.action((src, dest, { config: configPath, quiet }) =>
+  build(ahub, { src, dest, Html, configPath }, !quiet)
   .catch(errorHandler)
 )
 

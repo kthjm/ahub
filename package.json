@@ -4,11 +4,9 @@
   "repository": "kthjm/ahub",
   "author": "kthjm <toxictoxer@gmail.com>",
   "license": "MIT",
-  "main": "dist/cjs.js",
-  "module": "dist/es.js",
-  "jsnext:main": "dist/es.js",
+  "main": "dist/index.js",
   "bin": "bin/ahub.js",
-  "description": "",
+  "description": "Generate site that is just a hub",
   "keywords": [],
   "nyc": {
     "require": [
@@ -18,15 +16,16 @@
     "instrument": false
   },
   "scripts": {
-    "nwb": "cross-env BABEL_ENV=ENV node -r babel-register",
-    "start": "run-p watch:src watch:out",
+    "test": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts",
+    "coverage": "nyc report --reporter=lcov && codecov",
+    "build": "cross-env BABEL_ENV=BUILD rollup -c",
     "prestart": "node script.prestart.js",
+    "start": "run-p watch:src watch:out",
     "watch:src": "nodemon -w src -w script.start.js -x \"node script.start.js\"",
     "watch:out": "browser-sync start -w --no-notify --server .out",
-    "test": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts",
-    "ahub:src": "yarn nwb src/bin.index.js",
+    "nwb": "cross-env BABEL_ENV=ENV node -r babel-register",
     "ahub": "node bin/ahub.js",
-    "build": "cross-env BABEL_ENV=BUILD rollup -c"
+    "ahub:src": "yarn nwb src/bin.index.js"
   },
   "dependencies": {
     "atra": "^1.2.3",
@@ -69,8 +68,6 @@
     "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-prettier": "^0.4.0",
-    "serve": "^9.4.0",
-    "stylus": "^0.54.5"
+    "rollup-plugin-prettier": "^0.4.0"
   }
 }

@@ -9,12 +9,12 @@ const ahub = (
   src,
   dest,
   template,
-  { favicons, verbose, sitemap, watch: chokidarOpts, ignored: userIgnored } = {}
+  { favicons, sitemap, verbose, ignored: userIgnored, watch: chokidarOpts } = {}
 ) =>
 Promise.resolve()
 .then(() => {
-  asserts(src, `${src} is invalid as src`)
-  asserts(dest, `${dest} is invalid as dest`)
+  asserts(src && typeof src === 'string', `src is required`)
+  asserts(dest && typeof dest === 'string', `dest is required`)
   asserts(typeof template === 'function', `template is required as function`)
 })
 .then(() =>

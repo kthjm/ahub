@@ -1,17 +1,13 @@
-import { resolve } from 'url'
-
-export const createConfig = (src, dest = '') => ({
+export const createConfig = (src = '', dest = '') => ({
   src,
   dest,
+  ignored: [],
   sitemap: {
     hostname: 'https://foo.com'
   },
-  favicons: {
-    appName: '',
-    appDescription: ''
-  },
-  watch: {},
-  ignored: []
+  favicons: {},
+  chokidar: {},
+  browsersync: {}
 })
 
 export const createPage = (isIndex, embed) =>
@@ -32,54 +28,20 @@ export const createPage = (isIndex, embed) =>
   body: Object.assign({ background: 'silver', color: '#ffffff' }, bodyUnique(embed))
 }
 
-const bodyUnique = ({ title, hub1, hub2 } = {}) => ({
+const bodyUnique = ({ title, hub, hub2 } = {}) => ({
   header: {
     image: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
     description: '{ description }'
   },
-  links: !hub1
+  links: !hub
   ? [ link() ]
-  : [ link({ title: 'title' }), link({ hub: hub1 }), link({ title: 'title', hub: hub2 || hub1 }) ]
+  : [ link({ title: 'title' }), link({ hub: hub }), link({ title: 'title', hub: hub2 || hub }) ]
 })
 
 const link = ({ title = '', hub = '' } = {}) => ({
   title: title,
   href: 'https://github.com/',
   image: 'https://image.flaticon.com/icons/svg/25/25231.svg',
-  hub: hub && resolve('/', hub)
+  hub: hub
 })
-
-/*
-
-{
-  inherit: boolean,
-  lang: '',
-  head: {
-    title: '',
-    og: boolean,
-    ga: '',
-    tags: [
-      ['tag', attribs, 'text']
-    ]
-  },
-  body: {
-    background: '',
-    color: '',
-    header: {
-      image: '',
-      title: '',
-      description: ''
-    },
-    links: [
-      {
-        title: '',
-        href: '',
-        image: '',
-        hub: ''
-      }
-    ]
-  }
-}
-
-*/

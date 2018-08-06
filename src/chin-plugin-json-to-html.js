@@ -2,6 +2,7 @@ import { createSitemap } from 'sitemap'
 import pretty from 'pretty'
 import { format as pathFormat, join as pathJoin } from 'path'
 import { resolve as urlResolve } from 'url'
+import { asserts } from './util.js'
 
 const isStream = false
 const options = { encoding: 'utf8' }
@@ -10,10 +11,18 @@ export default (template, options) => {
 
   const { sitemap: sitemapOpts } = options
 
-  let sitemapCreated = false
+  const isSitemap = typeof sitemapOpts === 'object' && !Array.isArray(sitemapOpts)
+
+  if (isSitemap) {
+    const { hostname } = sitemapOpts
+    asserts(typeof hostname === 'string', `hostname is required in sitemap`)
+    asserts(hostname.includes('http'), `Protocol is required in sitemap.hostname`)
+  }
+
+  let isCreated = false
   const sitemapUrls = []
   const sitemaps = () => {
-    sitemapCreated = true
+    isCreated = true
     const urls = sortUrls(sitemapUrls)
     return !urls.length ? undefined : {
       robotsTxt: createRobotsTxt(sitemapOpts.hostname),
@@ -26,7 +35,7 @@ export default (template, options) => {
     const reout = Object.assign(out, { ext: '.html' }, out.name !== 'index' && { dir: pathJoin(out.dir, out.name), name: 'index' })
     const pathname = urlResolve('', reout.dir.split(process.env.CHIN_OUT)[1] || '/')
 
-    if (sitemapOpts && !sitemapCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
+    if (isSitemap && !isCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
 
     return Promise.resolve()
     .then(() => template(props, pathname))

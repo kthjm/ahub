@@ -5,34 +5,31 @@ function _interopDefault(ex) {
   return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex
 }
 
-var url = require('url')
 var React = _interopDefault(require('react'))
 var server = require('react-dom/server')
 var fsExtra = require('fs-extra')
-var browsersync = _interopDefault(require('browser-sync'))
+var bs = _interopDefault(require('browser-sync'))
 var path = require('path')
 var program = _interopDefault(require('commander'))
 var figures = require('figures')
 var chalk = require('chalk')
 var ahub = _interopDefault(require('..'))
-var Html = _interopDefault(require('../component'))
+var Html = _interopDefault(require('../component/index.js'))
 
 const throws = err => {
   throw typeof err === 'string' ? new Error(err) : err
 }
 
-const createConfig = (src, dest = '') => ({
+const createConfig = (src = '', dest = '') => ({
   src,
   dest,
+  ignored: [],
   sitemap: {
     hostname: 'https://foo.com'
   },
-  favicons: {
-    appName: '',
-    appDescription: ''
-  },
-  watch: {},
-  ignored: []
+  favicons: {},
+  chokidar: {},
+  browsersync: {}
 })
 
 const createPage = (isIndex, embed) =>
@@ -56,19 +53,19 @@ const createPage = (isIndex, embed) =>
         )
       }
 
-const bodyUnique = ({ title, hub1, hub2 } = {}) => ({
+const bodyUnique = ({ title, hub, hub2 } = {}) => ({
   header: {
     image:
       'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
     description: '{ description }'
   },
-  links: !hub1
+  links: !hub
     ? [link()]
     : [
         link({ title: 'title' }),
-        link({ hub: hub1 }),
-        link({ title: 'title', hub: hub2 || hub1 })
+        link({ hub: hub }),
+        link({ title: 'title', hub: hub2 || hub })
       ]
 })
 
@@ -76,42 +73,8 @@ const link = ({ title = '', hub = '' } = {}) => ({
   title: title,
   href: 'https://github.com/',
   image: 'https://image.flaticon.com/icons/svg/25/25231.svg',
-  hub: hub && url.resolve('/', hub)
+  hub: hub
 })
-
-/*
-
-{
-  inherit: boolean,
-  lang: '',
-  head: {
-    title: '',
-    og: boolean,
-    ga: '',
-    tags: [
-      ['tag', attribs, 'text']
-    ]
-  },
-  body: {
-    background: '',
-    color: '',
-    header: {
-      image: '',
-      title: '',
-      description: ''
-    },
-    links: [
-      {
-        title: '',
-        href: '',
-        image: '',
-        hub: ''
-      }
-    ]
-  }
-}
-
-*/
 
 const SRC = '.'
 const DEST = '_site'
@@ -132,8 +95,6 @@ var _extends =
 
     return target
   }
-
-/*  */
 
 const createTemplate = (Html$$1, indexJsonPath) => (
   props,
@@ -167,19 +128,20 @@ const normalizeConfig = ({
   dest,
   Html: Html$$1,
   configPath,
-  isWatch,
-  isProduct
+  isProduct,
+  isWatch
 }) =>
   Promise.resolve()
     .then(() => getConfig(configPath))
     .then(config => ({
       src: src || config.src || SRC,
       dest: dest || config.dest || DEST,
+      template: undefined,
+      ignored: config.ignored,
       sitemap: isProduct ? config.sitemap : undefined,
       favicons: isProduct ? config.favicons || true : undefined,
-      watch: isWatch ? config.watch || true : undefined,
-      ignored: config.ignored,
-      template: undefined
+      chokidar: isWatch ? config.chokidar || true : undefined,
+      browsersync: isWatch ? config.browsersync : undefined
     }))
     .then(config => {
       const indexJsonPath = path.join(config.src, 'index.json')
@@ -195,41 +157,54 @@ const normalizeConfig = ({
         )
     })
 
-const build = (ahub$$1, verbose, options) =>
-  normalizeConfig(options).then(
-    ({ src, dest, sitemap, template, watch, favicons, ignored }) =>
-      fsExtra
-        .remove(dest)
-        .then(() =>
-          ahub$$1(src, dest, template, {
-            sitemap,
-            watch,
-            favicons,
-            ignored,
-            verbose
-          })
-        )
+const build = (ahub$$1, options, verbose) =>
+  normalizeConfig(Object.assign({}, options, { isProduct: true })).then(
+    ({ src, dest, template, sitemap, favicons, ignored }) =>
+      fsExtra.remove(dest).then(() =>
+        ahub$$1(src, dest, template, {
+          favicons,
+          sitemap,
+          verbose,
+          ignored
+        })
+      )
   )
 
-const serve = (ahub$$1, verbose, options) =>
-  normalizeConfig(options).then(
-    ({ src, dest, sitemap, template, watch, favicons, ignored }) =>
+const serve = (ahub$$1, options, verbose) =>
+  normalizeConfig(Object.assign({}, options, { isWatch: true })).then(
+    ({
+      src,
+      dest,
+      template,
+      sitemap,
+      favicons,
+      ignored,
+      chokidar,
+      browsersync
+    }) =>
       fsExtra
         .remove(dest)
         .then(() =>
           ahub$$1(src, dest, template, {
-            sitemap,
-            watch,
             favicons,
+            sitemap,
+            verbose,
             ignored,
-            verbose
+            watch: chokidar
           })
         )
-        .then(watcher =>
-          browsersync
-            .create()
-            .init({ server: dest, watch: true, notify: false })
-        )
+        .then(watcher => {
+          const instance = bs.create()
+          return new Promise(resolve =>
+            instance.init(
+              Object.assign({ notify: false }, browsersync, {
+                server: dest,
+                watch: true
+              }),
+              () => resolve(instance)
+            )
+          )
+        })
   )
 
 const create = (path$$1, isIndex) => {
@@ -240,27 +215,23 @@ const create = (path$$1, isIndex) => {
   )
 }
 
-const init = (src, dest) =>
+const init = (src = SRC, dest = DEST) =>
   Promise.all(
     [
       [CONFIG, jtringify(createConfig(src, dest))],
       [
         path.join(src, 'index.json'),
         jtringify(
-          createPage(true, {
-            title: 'index.json',
-            hub1: 'page1',
-            hub2: 'page2'
-          })
+          createPage(true, { title: 'index', hub: '/page1', hub2: '/page2' })
         )
       ],
       [
         path.join(src, 'page1.json'),
-        jtringify(createPage(false, { title: 'page1.json', hub1: 'page2' }))
+        jtringify(createPage(false, { title: 'page1', hub: '/page2' }))
       ],
       [
         path.join(src, 'page2.json'),
-        jtringify(createPage(false, { title: 'page2.json', hub1: 'page1' }))
+        jtringify(createPage(false, { title: 'page2', hub: '/page1' }))
       ]
     ].map(arg => fsExtra.outputFile(...arg))
   )
@@ -290,8 +261,8 @@ program
   .version(require('../package.json').version, '-v, --version')
 
 program
-  .command('init <src> [dest]')
-  .usage(`<src> [dest]`)
+  .command('init [src] [dest]')
+  .usage(`[src: '${SRC}'] [dest: '${DEST}']`)
   .on('--help', () => console.log(``))
   .action((src, dest) => init(src, dest).catch(errorHandler))
 
@@ -318,14 +289,8 @@ program
   )
   .option('-q, --quiet', 'without log')
   .on('--help', () => console.log(``))
-  .action((src, dest, { config, quiet }) =>
-    serve(ahub, !quiet, {
-      src,
-      dest,
-      Html,
-      configPath: config,
-      isWatch: true
-    }).catch(errorHandler)
+  .action((src, dest, { config: configPath, quiet }) =>
+    serve(ahub, { src, dest, Html, configPath }, !quiet).catch(errorHandler)
   )
 
 program
@@ -337,14 +302,8 @@ program
   )
   .option('-q, --quiet', 'without log')
   .on('--help', () => console.log(``))
-  .action((src, dest, { config, quiet }) =>
-    build(ahub, !quiet, {
-      src,
-      dest,
-      Html,
-      configPath: config,
-      isProduct: true
-    }).catch(errorHandler)
+  .action((src, dest, { config: configPath, quiet }) =>
+    build(ahub, { src, dest, Html, configPath }, !quiet).catch(errorHandler)
   )
 
 program.parse(process.argv)

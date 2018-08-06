@@ -35,10 +35,7 @@ export default ({
     Array.isArray(userIgnored) ? userIgnored : []
   )
 
-  const watch = Object.assign(
-    { ignored, ignoreInitial: true },
-    chokidarOpts
-  )
+  const watch = Object.assign({ ignored, ignoreInitial: true }, chokidarOpts)
 
   return build({ put, out, verbose, processors, ignored, watch })
 }
