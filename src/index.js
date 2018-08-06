@@ -49,13 +49,12 @@ Promise.resolve()
     watch,
     processors: processors(json2html),
   })
-  .then(watcher => ({ watcher, sitemaps: json2html.sitemaps() }))
+  .then(watcher =>
+    typeof json2html.sitemaps === 'function'
+    ? buildSitemap(dest, json2html.sitemaps()).then(() => watcher)
+    : watcher
+  )
 })
-.then(({ watcher, sitemaps }) =>
-  !sitemaps
-  ? watcher
-  : buildSitemap(dest, sitemaps).then(() => watcher)
-)
 
 const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
   Promise.all([

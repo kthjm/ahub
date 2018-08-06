@@ -10,23 +10,18 @@ const options = { encoding: 'utf8' }
 export default (template, options) => {
 
   const { sitemap: sitemapOpts } = options
-
-  const isSitemap = typeof sitemapOpts === 'object' && !Array.isArray(sitemapOpts)
-
-  if (isSitemap) {
+  let sitemaps, isCreated = false
+  const sitemapUrls = []
+  if (typeof sitemapOpts === 'object' && !Array.isArray(sitemapOpts)) {
     const { hostname } = sitemapOpts
     asserts(typeof hostname === 'string', `hostname is required in sitemap`)
     asserts(hostname.includes('http'), `Protocol is required in sitemap.hostname`)
-  }
-
-  let isCreated = false
-  const sitemapUrls = []
-  const sitemaps = () => {
-    isCreated = true
-    const urls = sortUrls(sitemapUrls)
-    return !urls.length ? undefined : {
-      robotsTxt: createRobotsTxt(sitemapOpts.hostname),
-      sitemapXml: pretty(createSitemap(Object.assign({}, sitemapOpts, { urls })).toString())
+    sitemaps = () => {
+      isCreated = true
+      return {
+        robotsTxt: createRobotsTxt(hostname),
+        sitemapXml: pretty(createSitemap(Object.assign({}, sitemapOpts, { urls: sortUrls(sitemapUrls) })).toString())
+      }
     }
   }
 
@@ -35,7 +30,7 @@ export default (template, options) => {
     const reout = Object.assign(out, { ext: '.html' }, out.name !== 'index' && { dir: pathJoin(out.dir, out.name), name: 'index' })
     const pathname = urlResolve('', reout.dir.split(process.env.CHIN_OUT)[1] || '/')
 
-    if (isSitemap && !isCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
+    if (sitemaps && !isCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
 
     return Promise.resolve()
     .then(() => template(props, pathname))
