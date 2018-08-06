@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/ahub.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/ahub)
 [![npm](https://img.shields.io/npm/dm/ahub.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/ahub)
-[![Build Status](https://img.shields.io/travis/kthjm/ahub.svg?longCache=true&style=flat-square)](https://travis-ci.org/kthjm/ahub)
+[![Build Status](https://img.shields.io/circleci/project/github/kthjm/ahub.svg?logo=circleci&longCache=true&style=flat-square)](https://circleci.com/gh/kthjm/ahub)
 [![Coverage Status](https://img.shields.io/codecov/c/github/kthjm/ahub.svg?longCache=true&style=flat-square)](https://codecov.io/github/kthjm/ahub)
 
 Generate site that is not blog, but a hub.
