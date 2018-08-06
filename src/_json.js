@@ -41,7 +41,7 @@ const bodyUnique = ({ title, hub, hub2 } = {}) => ({
 
 const link = ({ title = '', hub = '' } = {}) => ({
   title: title,
-  href: 'https://github.com/',
   image: 'https://image.flaticon.com/icons/svg/25/25231.svg',
+  href: 'https://github.com/',
   hub: hub
 })
