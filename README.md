@@ -67,8 +67,7 @@ yarn ahub serve
 #### command: `build`
 - [`sitemap`](https://github.com/ekalinin/sitemap.js)
 - [`favicons`](https://github.com/itgalaxy/favicons)
-  - Because [#226](https://github.com/itgalaxy/favicons/pull/226), it needs `yarn add -D core-js` temporarily.
-
+  - Because [#226](https://github.com/itgalaxy/favicons/pull/226), it may need `yarn add -D core-js` temporarily.
 
 ## CLI
 ```shell
