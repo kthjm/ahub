@@ -1,67 +1,51 @@
-import chin from 'chin'
-import plugin from './plugin.js'
+import { outputFile } from 'fs-extra'
+import { join as pathJoin, resolve as pathResolve, sep as pathSep } from 'path'
+import buildFavicons from './buildFavicons.js'
+import buildPages from './buildPages.js'
+import j2h from './chin-plugin-json-to-html.js'
+import { asserts } from './util.js'
 
-const requireRootConfig = () => {
-  let rootConfig
-  try {
-    rootConfig = rooquire('index.json')
-  }
-  catch (err) {
-    throw err
-  }
-  return rootConfig
-}
+const ahub = (
+  src,
+  dest,
+  template,
+  { favicons, sitemap, verbose, ignored: userIgnored, watch: chokidarOpts } = {}
+) =>
+Promise.resolve()
+.then(() => {
+  asserts(src && typeof src === 'string', `src is required`)
+  asserts(dest && typeof dest === 'string', `dest is required`)
+  asserts(typeof template === 'function', `template is required as function`)
+})
+.then(() =>
+  !favicons
+  ? ''
+  : buildFavicons(src, dest, favicons)
+)
+.then(faviconsHtml => {
+  const json2html = j2h((props, pathname) => template(props, pathname, faviconsHtml), { sitemap })
+  return buildPages({
+    put: src,
+    out: dest,
+    verbose,
+    processors: { json: json2html },
+    userIgnored,
+    chokidarOpts
+  })
+  .then(watcher => ({ watcher, sitemaps: json2html.sitemaps() }))
+})
+.then(({ watcher, sitemaps }) =>
+  !sitemaps
+  ? watcher
+  : buildSitemap(dest, sitemaps).then(() => watcher)
+)
 
-const requireIgnored = () => {
-  let ignored
-  try {
-    ignored = rooquire('.hrefsignore')
-  }
-  catch (err) {
-    ignored = defaultIgnored
-  }
-  return ignored
-}
+const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
+  Promise.all([
+    ['sitemap.xml', sitemapXml],
+    ['robots.txt', robotsTxt]
+  ].map(([ filename, string ]) =>
+    outputFile(pathJoin(dest, filename), string)
+  ))
 
-const outputFiles = (files) => Promise.all(files.map(arg => outputFile(...arg)))
-const arrjoin = (arr) => arr.join()
-
-const buildFavicons = (rootConfig) => {
-  const { processor, after } = favicons(rootConfig.favicons)
-  return Promise
-  .all([
-    readFile('favicons.png'),
-    { out: process.env.CHIN_OUT + 'favicons.png', msg: () => {}, on: () => {} }
-  ])
-  .then(processor)
-  .then(outputFiles)
-  .then(after)
-  .then(arrjoin)
-}
-
-const buildPages = (rootConfig, favicons) => {
-  const json = plugin(rootConfig, favicons)
-  return requireIgnored()
-  .then(ignored =>
-    chin({
-      put,
-      out,
-      ignored,
-      verbose: true,
-      processors: { json }
-    })
-  )
-  .then(() =>
-    outputFile(
-      process.env.CHIN_OUT + '/sitemap.xml',
-      json.sitemap()
-    )
-  )
-}
-
-const flow = async () => {
-  const rootConfig = requireRootConfig()
-  const favicons = await buildFavicons(rootConfig)
-  return buildPages(rootConfig, favicons)
-}
-
+export default ahub

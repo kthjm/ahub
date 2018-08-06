@@ -1,13 +1,17 @@
 {
-  "name": "hrehub",
+  "name": "ahub",
   "version": "0.0.1",
-  "repository": "kthjm/hrehub",
+  "repository": "kthjm/ahub",
   "author": "kthjm <toxictoxer@gmail.com>",
   "license": "MIT",
-  "main": "",
-  "bin": "",
-  "description": "",
-  "keywords": [],
+  "main": "dist/index.js",
+  "bin": "bin/ahub.js",
+  "description": "Generate site that is just a hub",
+  "keywords": [
+    "website",
+    "cms",
+    "framework"
+  ],
   "nyc": {
     "require": [
       "babel-register"
@@ -16,14 +20,34 @@
     "instrument": false
   },
   "scripts": {
-    "ex:build": "chin -c .example/chin.config.js",
-    "ex:serve": "serve .example/public",
-    "ex": "run-s ex:build ex:serve",
-    "test": "cross-env BABEL_ENV=TEST nyc mocha",
-    "build": "cross-env BABEL_ENV=BUILD rollup -c"
+    "test": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts",
+    "coverage": "nyc report --reporter=lcov && codecov",
+    "build": "cross-env BABEL_ENV=BUILD rollup -c",
+    "prestart": "node script.prestart.js",
+    "start": "run-p watch:src watch:out",
+    "watch:src": "nodemon -w src -w script.start.js -x \"node script.start.js\"",
+    "watch:out": "browser-sync start -w --no-notify --server .out",
+    "nwb": "cross-env BABEL_ENV=ENV node -r babel-register",
+    "ahub": "node bin/ahub.js",
+    "ahub:src": "yarn nwb src/bin.index.js"
   },
   "dependencies": {
-    "chin": "^3.1.1"
+    "atra": "^1.2.3",
+    "browser-sync": "^2.24.6",
+    "chalk": "^2.4.1",
+    "chin": "^3.1.2",
+    "commander": "^2.16.0",
+    "figures": "^2.0.0",
+    "fs-extra": "^7.0.0",
+    "html-tag": "^2.0.0",
+    "pretty": "^2.0.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-html-parser": "^2.0.2",
+    "sitemap": "^1.13.0"
+  },
+  "optionalDependencies": {
+    "favicons": "^5.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -33,18 +57,21 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-power-assert": "^2.0.0",
+    "babel-preset-react": "^6.24.1",
     "codecov": "^3.0.4",
     "cross-env": "^5.2.0",
     "mocha": "^5.2.0",
     "mock-fs": "^4.5.0",
+    "nodemon": "^1.18.3",
     "npm-run-all": "^4.1.3",
     "nyc": "^12.0.2",
     "power-assert": "^1.6.0",
     "rollup": "^0.63.4",
     "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-flow": "^1.1.1",
-    "rollup-plugin-prettier": "^0.4.0",
-    "serve": "^9.4.0"
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-prettier": "^0.4.0"
   }
 }

@@ -1,3 +1,11 @@
+.garbage/
+.put/
+.out/
+_config.json
+bin/
+dist/
+component/
+
 # Logs
 logs
 *.log

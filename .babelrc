@@ -1,23 +1,29 @@
 {
+  "presets": [
+    "react"
+  ],
   "env": {
+    "ENV": {
+      "presets": [
+        "env"
+      ]
+    },
     "TEST": {
        "presets": [
          "env",
-         "flow",
          "power-assert"
        ],
        "plugins": [
-         "istanbul",
-         ["transform-runtime", {
-           "helpers": false,
-           "polyfill": false,
-           "regenerator": true
-         }]
+         "istanbul"
        ]
     },
     "BUILD": {
-      "presets": [["env", { "targets": { "node": "8.11.3" }, "modules": false }]],
-      "plugins": ["external-helpers"]
+      "presets": [
+        ["env", { "targets": { "node": "8.11.3" }, "modules": false }]
+      ],
+      "plugins": [
+        "external-helpers"
+      ]
     }
   }
 }
