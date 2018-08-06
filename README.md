@@ -14,57 +14,78 @@ yarn ahub serve
 ```
 
 ## Page.json
-```js
+```json
 {
-  inherit: boolean,
-  lang: '',
-  head: {},
-  body: {}
+  "inherit": false,
+  "lang": "",
+  "head": {},
+  "body": {}
 }
 ```
+### inherit
+Indicate whether to inherit the following properties from `index.json`.
+- `lang`
+- `head`
+- `body.background`
+- `body.color`
 
-#### head
-- `title: string`
-- `og: boolean`
-- `ga: string`
-- [`tags: []`](https://github.com/jonschlinkert/html-tag)
+### head
+#### `title`
+text for `<title>{title}</title>`.
 
-#### body
-- `background`
-- `color`
-- `header`
-  - `image`
-  - `title`
-  - `description`
-- `links: []`
-  - `title`
-  - `href`
-  - `image`
-  - `hub`
+#### `og`
+Whether to add prefix to `<head>`.
+
+#### `ga`
+GA_TRACKING_ID for [gtagjs](https://developers.google.com/analytics/devguides/collection/gtagjs/).
+
+#### `tags`
+Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-tag) params.
+
+### body
+```js
+{
+  "background": "",
+  "color": "",
+  "header": {
+    "image": "",
+    "title": "",
+    "description": ""
+  },
+  "links": [
+    {
+      "title": "",
+      "image": "",
+      "href": "", // target="_blank"
+      "hub": ""   // target="_self"
+    }
+  ]
+}
+```
 
 ## _config.json
-```js
+```json
 {
-  src: '',
-  dest: '',
-  ignored: [],
-  sitemap: {},
-  favicons: {},
-  chokidar: {},
-  browsersync: {}
+  "src": "",
+  "dest": "",
+  "ignored": [],
+  "sitemap": {},
+  "favicons": {},
+  "chokidar": {},
+  "browsersync": {}
 }
 ```
 
-#### common
+### common
 - `src`
 - `dest`
 - [`ignored`](https://github.com/jergason/recursive-readdir)
 
-#### command: `serve`
+### command: `serve`
 - [`chokidar`](https://github.com/paulmillr/chokidar)
 - [`browsersync`](https://browsersync.io/docs/options)
 
-#### command: `build`
+### command: `build`
 - [`sitemap`](https://github.com/ekalinin/sitemap.js)
 - [`favicons`](https://github.com/itgalaxy/favicons)
   - Because [#226](https://github.com/itgalaxy/favicons/pull/226), it may need `yarn add -D core-js` temporarily.
