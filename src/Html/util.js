@@ -9,3 +9,8 @@ export const Hidden = ({ type, attributes = {} }) => createElement(
   }),
   '.'
 )
+
+export const arr2nesty = (array, length) => array.reduce((a, c) =>
+  (a[a.length - 1].length === length ? a.push([c]) : a[a.length - 1].push(c)) && a,
+  [[]]
+)

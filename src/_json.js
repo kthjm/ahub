@@ -25,7 +25,7 @@ export const createPage = (isIndex, embed) =>
     ga: '',
     tags: []
   },
-  body: Object.assign({ background: 'silver', color: '#ffffff' }, bodyUnique(embed))
+  body: Object.assign({ background: 'silver', color: '#ffffff', linksRowLength: 2 }, bodyUnique(embed))
 }
 
 const bodyUnique = ({ title, hub } = {}) => ({

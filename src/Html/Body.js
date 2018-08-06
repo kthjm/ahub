@@ -8,6 +8,7 @@ const Body = ({
   pathname,
   background,
   color,
+  linksRowLength,
   header = {},
   links = []
 }) =>
@@ -15,7 +16,7 @@ const Body = ({
   {pathname !== '/' && <ToRoot />}
   <main {...a('WIDTH')}>
     <Header {...header} />
-    <Links {...{ links }} />
+    <Links {...{ links, rowLength: linksRowLength }} />
   </main>
   {/* <footer></footer> */}
 </body>
