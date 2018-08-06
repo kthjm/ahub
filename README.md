@@ -47,18 +47,27 @@ yarn ahub serve
 {
   src: '',
   dest: '',
+  ignored: [],
   sitemap: {},
   favicons: {},
   chokidar: {},
-  browsersync: {},
-  ignored: []
+  browsersync: {}
 }
 ```
-- [`sitemap`](https://github.com/ekalinin/sitemap.js)
-- [`favicons`](https://github.com/itgalaxy/favicons)
+
+#### common
+- `src`
+- `dest`
+- [`ignored`](https://github.com/jergason/recursive-readdir)
+
+#### command: `serve`
 - [`chokidar`](https://github.com/paulmillr/chokidar)
 - [`browsersync`](https://browsersync.io/docs/options)
-- [`ignored`](https://github.com/jergason/recursive-readdir)
+
+#### command: `build`
+- [`sitemap`](https://github.com/ekalinin/sitemap.js)
+- [`favicons`](https://github.com/itgalaxy/favicons)
+  - Because [#226](https://github.com/itgalaxy/favicons/pull/226), it needs `yarn add -D core-js` temporarily.
 
 
 ## CLI
