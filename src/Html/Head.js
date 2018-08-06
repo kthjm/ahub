@@ -17,7 +17,7 @@ const Ga = ({ id }) =>
 
 export default ({ title, og, ga, embed }) =>
 <head prefix={!og ? undefined : ogPrefix}>
+  {ga && <Ga id={ga} />}
   {title && <title>{title}</title>}
   {embed}
-  {ga && <Ga id={ga} />}
 </head>
