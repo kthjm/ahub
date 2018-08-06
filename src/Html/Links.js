@@ -3,7 +3,7 @@ import Atra from 'atra'
 import { Hidden } from './util.js'
 import { arr2nesty } from '../util.js'
 
-const LENGTH = 3
+const LENGTH = 2
 const BLOCK_MARGIN = 4
 
 const Links = ({ links }) =>
