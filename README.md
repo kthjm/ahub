@@ -63,7 +63,7 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 }
 ```
 
-## _config.json
+## ahub.json
 ```json
 {
   "src": "",

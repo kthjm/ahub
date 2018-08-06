@@ -28,7 +28,7 @@ describe('with mock tree', () => {
 
   const tree = {
     'node_modules': mock.symlink({ path: 'node_modules' }),
-    '_config.json': JSON.stringify({
+    'ahub.json': JSON.stringify({
       src,
       dest,
       ignored: [],
@@ -94,7 +94,7 @@ import { writeJson, remove } from 'fs-extra'
 
 describe('bin.action.js', () => {
 
-  const configPath = '_config.test.json'
+  const configPath = 'ahub.test.json'
   const config = {
     browsersync: {
       open: false,
