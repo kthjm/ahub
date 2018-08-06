@@ -1,7 +1,7 @@
 .garbage/
 .put/
 .out/
-ahub.json
+ahub.config.js
 bin/
 dist/
 component/

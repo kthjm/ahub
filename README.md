@@ -13,6 +13,30 @@ yarn ahub init [src] [dest]
 yarn ahub serve
 ```
 
+## Structure
+
+    _site
+    ├─ index.html
+    ├─ page1/index.html
+    ├─ _favicons
+    └─ _image
+    site
+    ├─ index.json
+    ├─ page1.json
+    ├─ _favicons.[svg|png|jpg]
+    └─ _image
+    ahub.config.js
+    package.json
+
+### [name].json
+Transformed to `html`.
+
+### _favicons.[ext]
+Passed to [`favicons`](https://github.com/itgalaxy/favicons).
+
+### _image/
+Optimized directory.
+
 ## Page.json
 ```json
 {
@@ -47,6 +71,7 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 {
   "background": "",
   "color": "",
+  "linksRowLength": 2,
   "header": {
     "image": "",
     "title": "",
@@ -63,16 +88,16 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 }
 ```
 
-## ahub.json
-```json
-{
-  "src": "",
-  "dest": "",
-  "ignored": [],
-  "sitemap": {},
-  "favicons": {},
-  "chokidar": {},
-  "browsersync": {}
+## ahub.config.js
+```js
+module.exports = {
+  src: '',
+  dest: '',
+  ignored: [],
+  sitemap: {},
+  favicons: {},
+  chokidar: {},
+  browsersync: {}
 }
 ```
 

@@ -32,6 +32,7 @@
     "ahub:src": "yarn nwb src/bin.index.js"
   },
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "atra": "^1.2.3",
     "browser-sync": "^2.24.6",
     "chalk": "^2.4.1",

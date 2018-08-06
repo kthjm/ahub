@@ -1,6 +1,7 @@
-export const createConfig = (src = '', dest = '') => ({
-  src,
-  dest,
+export const createConfig = (src = '', dest = '') =>
+`module.exports = {
+  src: '${src}',
+  dest: '${dest}',
   ignored: [],
   sitemap: {
     hostname: 'https://foo.com'
@@ -8,7 +9,7 @@ export const createConfig = (src = '', dest = '') => ({
   favicons: {},
   chokidar: {},
   browsersync: {}
-})
+}`
 
 export const createPage = (isIndex, embed) =>
 !isIndex
