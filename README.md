@@ -9,49 +9,40 @@ Generate site that is not blog, but a hub.
 
 ```shell
 yarn add -D ahub
-yarn ahub init <src> [dest]
+yarn ahub init [src] [dest]
 yarn ahub serve
 ```
 
-`page.json`:
+## Page.json
 ```js
 {
   inherit: boolean,
   lang: '',
-  head: {
-    title: '',
-    og: boolean,
-    ga: '',
-    tags: []
-  },
-  body: {
-    background: '',
-    color: '',
-    header: {
-      image: '',
-      title: '',
-      description: ''
-    },
-    links: [
-      {
-        title: '',
-        href: '',
-        image: '',
-        hub: ''
-      }
-    ]
-  }
+  head: {},
+  body: {}
 }
 ```
-- [`tags`](https://github.com/jonschlinkert/html-tag)
 
-#### inherited
-- `lang`
-- `head`
-- `body.background`
-- `body.color`
+#### head
+- `title: string`
+- `og: boolean`
+- `ga: string`
+- [`tags: []`](https://github.com/jonschlinkert/html-tag)
 
-`_config.json`:
+#### body
+- `background`
+- `color`
+- `header`
+  - `image`
+  - `title`
+  - `description`
+- `links: []`
+  - `title`
+  - `href`
+  - `image`
+  - `hub`
+
+## _config.json
 ```js
 {
   src: '',
@@ -69,8 +60,9 @@ yarn ahub serve
 - [`browsersync`](https://browsersync.io/docs/options)
 - [`ignored`](https://github.com/jergason/recursive-readdir)
 
-```shell
 
+## CLI
+```shell
   Usage: ahub [options] [command]
 
   Options:
@@ -80,7 +72,7 @@ yarn ahub serve
 
   Commands:
 
-    init <src> [dest]
+    init [src] [dest]
     create [options] <page...>
     serve [options] [src] [dest]
     build [options] [src] [dest]
