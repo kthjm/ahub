@@ -99,9 +99,8 @@ export const create = (path, isIndex) => {
 export const init = (src = SRC, dest = DEST) => Promise.all(
   [
     [CONFIG, jtringify(createConfig(src, dest))],
-    [join(src, 'index.json'), jtringify(createPage(true, { title: 'index', hub: '/page1', hub2: '/page2' }))],
-    [join(src, 'page1.json'), jtringify(createPage(false, { title: 'page1', hub: '/page2' }))],
-    [join(src, 'page2.json'), jtringify(createPage(false, { title: 'page2', hub: '/page1' }))]
+    [join(src, 'index.json'), jtringify(createPage(true, { title: 'index', hub: '/page' }))],
+    [join(src, 'page.json'), jtringify(createPage(false, { title: 'page' }))]
   ]
   .map(arg => outputFile(...arg))
 )

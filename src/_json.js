@@ -28,7 +28,7 @@ export const createPage = (isIndex, embed) =>
   body: Object.assign({ background: 'silver', color: '#ffffff' }, bodyUnique(embed))
 }
 
-const bodyUnique = ({ title, hub, hub2 } = {}) => ({
+const bodyUnique = ({ title, hub } = {}) => ({
   header: {
     image: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
@@ -36,7 +36,7 @@ const bodyUnique = ({ title, hub, hub2 } = {}) => ({
   },
   links: !hub
   ? [ link() ]
-  : [ link({ title: 'title' }), link({ hub: hub }), link({ title: 'title', hub: hub2 || hub }) ]
+  : [ link({ title: 'title' }), link({ hub: hub }), link({ title: 'title', hub: hub }) ]
 })
 
 const link = ({ title = '', hub = '' } = {}) => ({
