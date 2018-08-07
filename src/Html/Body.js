@@ -4,6 +4,13 @@ import ToRoot from './ToRoot.js'
 import Header from './Header.js'
 import Links from './Links.js'
 
+const setBodyFontSize = `
+const isMobile = navigator.userAgent.toLowerCase().includes('mobile')
+document.body.style.fontSize = isMobile ? '2em' : '1em'
+`
+
+const script = <script dangerouslySetInnerHTML={{ __html: setBodyFontSize }} />
+
 const Body = ({
   pathname,
   background,
@@ -13,6 +20,7 @@ const Body = ({
   links = []
 }) =>
 <body {...a('BODY', { style: { background, color } })}>
+  {script}
   {pathname !== '/' && <ToRoot />}
   <main {...a('WIDTH')}>
     <Header {...header} />
@@ -33,8 +41,10 @@ const a = Atra({
   },
   WIDTH: {
     style: {
-      maxWidth: 870,
-      padding: '0px 40px',
+      // maxWidth: 870,
+      // padding: '0px 40px',
+      maxWidth: 1030,
+      padding: '0px 4px',
       margin: '0px auto 80px'
     }
   },

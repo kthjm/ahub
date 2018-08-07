@@ -43,6 +43,7 @@ const Link = (a =>
 )(Atra({
   LINK: {
     style: {
+      position: 'relative',
       borderRadius: 3,
       padding: '5px 20px 10px',
       height: 'auto',
@@ -88,9 +89,13 @@ const HrefImage = (a =>
   HREF: {
     style: {
       display: 'block',
-      maxWidth: 120,
-      height: 120,
-      margin: '12px auto 10px'
+      // maxWidth: 120,
+      // height: 120,
+      maxWidth: '7.5em',
+      height: '7.5em',
+      // margin: '12px auto 10px'
+      // margin: '30px auto 66px'
+      margin: '1.5em auto 3em'
     }
   },
   IMAGE: {
@@ -104,22 +109,24 @@ const HrefImage = (a =>
   }
 }))
 
+// {`<${href}>`}
+// <Hidden type={'div'} />
 const HrefHub = (a =>
 
 ({ href }) =>
-!href
-?
-<Hidden type={'div'} />
-:
+href &&
 <div {...a('WRAP')}>
   <a {...a('HREF', { href })}>
-    {'< hub >'}
+    {'<hub>'}
   </a>
 </div>
 
 )(Atra({
   WRAP: {
     style: {
+      position: 'absolute',
+      bottom: 2,
+      right: 8,
       textAlign: 'center'
     }
   },

@@ -11,9 +11,11 @@ export default ({ image, title, href, description }) =>
   </div>}
 
   {!title && !href ? false :
-  <a {...a('TITLE_HREF', href && { href, target: '_blank' })}>
-    <h1>{title || href}</h1>
-  </a>}
+  <h1 {...a('TITLE')}>
+    <a {...a('TITLE_HREF', href && { href, target: '_blank' })}>
+      {title || href}
+    </a>
+  </h1>}
 
   {description &&
   <div>
@@ -25,7 +27,8 @@ export default ({ image, title, href, description }) =>
 const a = Atra({
   HEADER: {
     style: {
-      margin: '30px 0px',
+      // margin: '30px 0px',
+      margin: '2.5em 0px 1em',
       textAlign: 'center'
     }
   },
@@ -37,8 +40,10 @@ const a = Atra({
   IMAGE: {
     style: {
       display: 'inline-block',
-      width: 110,
-      height: 110,
+      // width: 110,
+      // height: 110,
+      width: '6em',
+      height: '6em',
       borderRadius: 3,
       backgroundImage: undefined,
       backgroundSize: 'contain',
@@ -46,11 +51,15 @@ const a = Atra({
       backgroundRepeat: 'no-repeat'
     }
   },
+  TITLE: {
+    style: {
+      lineHeight: 1.4
+    }
+  },
   TITLE_HREF: {
     style: {
       textDecoration: 'none',
-      color: 'inherit',
-      lineHeight: 1.4
+      color: 'inherit'
     }
   }
 })
