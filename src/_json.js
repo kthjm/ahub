@@ -15,7 +15,7 @@ export const createPage = (isIndex, embed) =>
 !isIndex
 ? {
   inherit: true,
-  body: bodyUnique(embed)
+  body: createBody(embed)
 }
 : {
   lang: '',
@@ -26,13 +26,14 @@ export const createPage = (isIndex, embed) =>
     ga: '',
     tags: []
   },
-  body: Object.assign({ background: 'silver', color: '#ffffff', linksRowLength: 2 }, bodyUnique(embed))
+  body: Object.assign({ background: 'silver', color: '#ffffff', linksRowLength: 2 }, createBody(embed))
 }
 
-const bodyUnique = ({ title, hub } = {}) => ({
+const createBody = ({ title, hub } = {}) => ({
   header: {
     image: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
+    href: '',
     description: '{ description }'
   },
   links: !hub

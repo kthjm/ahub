@@ -80,7 +80,8 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
   "header": {
     "image": "",
     "title": "",
-    "description": ""
+    "href": "",
+    "description": "" // able to use html.
   },
   "links": [
     {
@@ -111,14 +112,14 @@ module.exports = {
 - `dest`
 - [`ignored`](https://github.com/jergason/recursive-readdir)
 
-### command: `serve`
-- [`chokidar`](https://github.com/paulmillr/chokidar)
-- [`browsersync`](https://browsersync.io/docs/options)
-
 ### command: `build`
 - [`sitemap`](https://github.com/ekalinin/sitemap.js)
 - [`favicons`](https://github.com/itgalaxy/favicons)
   - Because [#226](https://github.com/itgalaxy/favicons/pull/226), it may need `yarn add -D core-js` temporarily.
+
+### command: `serve`
+- [`chokidar`](https://github.com/paulmillr/chokidar)
+- [`browsersync`](https://browsersync.io/docs/options)
 
 ## CLI
 ```shell
@@ -136,6 +137,7 @@ module.exports = {
     create [options] <page...>
     serve [options] [src] [dest]
     build [options] [src] [dest]
+
 ```
 
 ## License

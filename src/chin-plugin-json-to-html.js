@@ -57,11 +57,11 @@ const createRobotsTxt = (hostname) =>
 `User-agent: *
 Sitemap: ${urlResolve(hostname, 'sitemap.xml')}`
 
-const createSitemapImg = ({ body: { avatar, links = [] } = {} } = {}) =>
+const createSitemapImg = ({ body: { header = {}, links = [] } = {} } = {}) =>
   []
   .concat(
-    [avatar],
-    links.map(({ icon } = {}) => icon)
+    [header.image],
+    links.map(({ image } = {}) => image)
   )
   .filter(url => url && !url.includes('http'))
   .map(url => ({ url }))
