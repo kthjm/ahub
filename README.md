@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/circleci/project/github/kthjm/ahub.svg?logo=circleci&longCache=true&style=flat-square)](https://circleci.com/gh/kthjm/ahub)
 [![Coverage Status](https://img.shields.io/codecov/c/github/kthjm/ahub.svg?longCache=true&style=flat-square)](https://codecov.io/github/kthjm/ahub)
 
-Generate site that is not blog, but a hub.
+Generate site that is not blog but a hub.
 
 ```shell
 yarn add -D ahub
@@ -13,18 +13,18 @@ yarn ahub init [src] [dest]
 yarn ahub serve
 ```
 
-## Structure
+## Directory Structure
 
-    _site
+    _site // dest
     ├─ index.html
     ├─ page1/index.html
-    ├─ _favicons
-    └─ _image
-    site
+    ├─ _favicons/**
+    └─ _image/**
+    site // src
     ├─ index.json
     ├─ page1.json
     ├─ _favicons.[svg|png|jpg]
-    └─ _image
+    └─ _image/**
     ahub.config.js
     package.json
 
@@ -35,7 +35,11 @@ Transformed to `html`.
 Passed to [`favicons`](https://github.com/itgalaxy/favicons).
 
 ### _image/
-Optimized directory.
+Optimized.
+- `png`
+- `jpg`
+- `svg`
+- `gif`
 
 ## Page.json
 ```json
@@ -52,6 +56,7 @@ Indicate whether to inherit the following properties from `index.json`.
 - `head`
 - `body.background`
 - `body.color`
+- `body.linksRowLength`
 
 ### head
 #### `title`
@@ -117,6 +122,7 @@ module.exports = {
 
 ## CLI
 ```shell
+
   Usage: ahub [options] [command]
 
   Options:

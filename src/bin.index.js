@@ -48,7 +48,7 @@ program
 program
 .command('serve [src] [dest]')
 .usage(`[src: '${SRC}'] [dest: '${DEST}'] [options]`)
-.option(`-c, --config <jsonfile>`, `default: '${CONFIG}'`)
+.option(`-c, --config <file>`, `default: '${CONFIG}'`)
 .option('-q, --quiet', 'without log')
 .on('--help', () => console.log(``))
 .action((src, dest, { config: configPath, quiet }) =>
@@ -59,7 +59,7 @@ program
 program
 .command('build [src] [dest]')
 .usage(`[src: '${SRC}'] [dest: '${DEST}'] [options]`)
-.option(`-c, --config <jsonfile>`, `default: '${CONFIG}'`)
+.option(`-c, --config <file>`, `default: '${CONFIG}'`)
 .option('-q, --quiet', 'without log')
 .on('--help', () => console.log(``))
 .action((src, dest, { config: configPath, quiet }) =>

@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "bin": "bin/ahub.js",
-  "description": "Generate site that is just a hub",
+  "description": "Generate site that is just a hub.",
   "keywords": [
     "website",
     "cms",
