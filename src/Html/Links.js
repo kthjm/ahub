@@ -95,6 +95,7 @@ const HrefImage = (a =>
   },
   IMAGE: {
     style: {
+      borderRadius: 3,
       height: '100%',
       backgroundSize: 'contain',
       backgroundPosition: 'center',

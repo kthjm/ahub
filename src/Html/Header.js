@@ -1,18 +1,37 @@
 import React from 'react'
+import h2r from 'react-html-parser'
 import Atra from 'atra'
 
-export default ({ image, title, description }) =>
+export default ({ image, title, href, description }) =>
 <header {...a('HEADER')}>
-  {image && <div><div {...a('IMAGE', { style: { backgroundImage: `url(${image})` } })} /></div>}
-  {title && <h1>{title}</h1>}
-  {description && <p>{description}</p>}
+
+  {image &&
+  <div {...a('IMAGE_WRAP')}>
+    <div {...a('IMAGE', { style: { backgroundImage: `url(${image})` } })} />
+  </div>}
+
+  {!title && !href ? false :
+  <a {...a('TITLE_HREF', href && { href, target: '_blank' })}>
+    <h1>{title || href}</h1>
+  </a>}
+
+  {description &&
+  <div>
+    {h2r(description)}
+  </div>}
+
 </header>
 
 const a = Atra({
   HEADER: {
     style: {
-      padding: '30px 0px',
+      margin: '30px 0px',
       textAlign: 'center'
+    }
+  },
+  IMAGE_WRAP: {
+    style: {
+      marginBottom: '1.34em'
     }
   },
   IMAGE: {
@@ -25,6 +44,13 @@ const a = Atra({
       backgroundSize: 'contain',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat'
+    }
+  },
+  TITLE_HREF: {
+    style: {
+      textDecoration: 'none',
+      color: 'inherit',
+      lineHeight: 1.4
     }
   }
 })
