@@ -1,28 +1,20 @@
 import React from 'react'
 import { renderToStaticMarkup as render } from 'react-dom/server'
 import { pathExists, readJson, remove, outputFile } from 'fs-extra'
+import { require as rooquire } from 'app-root-path'
 import bs from 'browser-sync'
 import { join, parse, extname, normalize, sep } from 'path'
 import { throws } from './util.js'
 import { createConfig, createPage } from './_json.js'
 import { SRC, DEST, CONFIG } from './variables.js'
 
-export const createTemplate = (Html, indexJsonPath) =>
-  (props, pathname, faviconsHtml) =>
-    readJson(indexJsonPath).then(indexJson =>
-      render(<Html {...props} {...{ pathname, indexJson, faviconsHtml }} />))
+const rooquireP = (path) =>
+  Promise.resolve().then(() => rooquire(path))
 
-export const getConfig = (configPath) =>
+const getConfig = (configPath) =>
   typeof configPath === 'string'
-  ?
-  readJson(configPath)
-  :
-  readJson(CONFIG).catch(() =>
-    readJson('package.json').then(userPackageJson =>
-      userPackageJson.ahub ||
-      {}
-    )
-  )
+  ? rooquireP(configPath)
+  : rooquireP(CONFIG).catch(() => ({}))
 
 const normalizeConfig = ({ src, dest, Html, configPath, isProduct, isWatch }) =>
   Promise.resolve()
@@ -45,6 +37,11 @@ const normalizeConfig = ({ src, dest, Html, configPath, isProduct, isWatch }) =>
       : Object.assign(config, { template: createTemplate(Html, indexJsonPath) })
     )
   })
+
+export const createTemplate = (Html, indexJsonPath) =>
+  (pathname, json, faviconsHtml) =>
+    readJson(indexJsonPath).then(indexJson =>
+      render(<Html {...json} {...{ pathname, indexJson, faviconsHtml }} />))
 
 export const build = (ahub, options, verbose) =>
 normalizeConfig(Object.assign({}, options, { isProduct: true }))
@@ -98,10 +95,9 @@ export const create = (path, isIndex) => {
 
 export const init = (src = SRC, dest = DEST) => Promise.all(
   [
-    [CONFIG, jtringify(createConfig(src, dest))],
-    [join(src, 'index.json'), jtringify(createPage(true, { title: 'index', hub: '/page1', hub2: '/page2' }))],
-    [join(src, 'page1.json'), jtringify(createPage(false, { title: 'page1', hub: '/page2' }))],
-    [join(src, 'page2.json'), jtringify(createPage(false, { title: 'page2', hub: '/page1' }))]
+    [CONFIG, createConfig(src, dest)],
+    [join(src, 'index.json'), jtringify(createPage(true, { title: 'index', hub: '/page' }))],
+    [join(src, 'page.json'), jtringify(createPage(false, { title: 'page' }))]
   ]
   .map(arg => outputFile(...arg))
 )

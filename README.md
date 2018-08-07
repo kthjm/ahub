@@ -5,13 +5,41 @@
 [![Build Status](https://img.shields.io/circleci/project/github/kthjm/ahub.svg?logo=circleci&longCache=true&style=flat-square)](https://circleci.com/gh/kthjm/ahub)
 [![Coverage Status](https://img.shields.io/codecov/c/github/kthjm/ahub.svg?longCache=true&style=flat-square)](https://codecov.io/github/kthjm/ahub)
 
-Generate site that is not blog, but a hub.
+Generate site that is not blog but a hub.
 
 ```shell
 yarn add -D ahub
 yarn ahub init [src] [dest]
 yarn ahub serve
 ```
+
+## Directory Structure
+
+    _site // dest
+    ├─ index.html
+    ├─ page1/index.html
+    ├─ _favicons/**
+    └─ _image/**
+    site // src
+    ├─ index.json
+    ├─ page1.json
+    ├─ _favicons.[svg|png|jpg]
+    └─ _image/**
+    ahub.config.js
+    package.json
+
+### [name].json
+Transformed to `html`.
+
+### _favicons.[ext]
+Passed to [`favicons`](https://github.com/itgalaxy/favicons) as source.
+
+### _image/
+Optimized.
+- `png`
+- `jpg`
+- `svg`
+- `gif`
 
 ## Page.json
 ```json
@@ -28,6 +56,7 @@ Indicate whether to inherit the following properties from `index.json`.
 - `head`
 - `body.background`
 - `body.color`
+- `body.linksRowLength`
 
 ### head
 #### `title`
@@ -47,6 +76,7 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 {
   "background": "",
   "color": "",
+  "linksRowLength": 2,
   "header": {
     "image": "",
     "title": "",
@@ -63,16 +93,16 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 }
 ```
 
-## _config.json
-```json
-{
-  "src": "",
-  "dest": "",
-  "ignored": [],
-  "sitemap": {},
-  "favicons": {},
-  "chokidar": {},
-  "browsersync": {}
+## ahub.config.js
+```js
+module.exports = {
+  src: '',
+  dest: '',
+  ignored: [],
+  sitemap: {},
+  favicons: {},
+  chokidar: {},
+  browsersync: {}
 }
 ```
 
@@ -92,6 +122,7 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 
 ## CLI
 ```shell
+
   Usage: ahub [options] [command]
 
   Options:

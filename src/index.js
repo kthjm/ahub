@@ -1,15 +1,32 @@
 import { outputFile } from 'fs-extra'
+import imagemin from 'chin-plugin-imagemin'
 import { join as pathJoin, resolve as pathResolve, sep as pathSep } from 'path'
 import buildFavicons from './buildFavicons.js'
 import buildPages from './buildPages.js'
 import j2h from './chin-plugin-json-to-html.js'
 import { asserts } from './util.js'
+import { IMAGE } from './variables.js'
+
+const img2min = imagemin()
+
+const processors = (json2html) => [
+  [IMAGE, {
+    svg: img2min,
+    png: img2min,
+    jpg: img2min,
+    jpeg: img2min,
+    gif: img2min
+  }],
+  ['*', {
+    json: json2html
+  }]
+]
 
 const ahub = (
   src,
   dest,
   template,
-  { favicons, sitemap, verbose, ignored: userIgnored, watch: chokidarOpts } = {}
+  { favicons, sitemap, verbose, ignored, watch } = {}
 ) =>
 Promise.resolve()
 .then(() => {
@@ -23,22 +40,21 @@ Promise.resolve()
   : buildFavicons(src, dest, favicons)
 )
 .then(faviconsHtml => {
-  const json2html = j2h((props, pathname) => template(props, pathname, faviconsHtml), { sitemap })
+  const json2html = j2h((pathname, json) => template(pathname, json, faviconsHtml), { sitemap })
   return buildPages({
     put: src,
     out: dest,
     verbose,
-    processors: { json: json2html },
-    userIgnored,
-    chokidarOpts
+    ignored,
+    watch,
+    processors: processors(json2html),
   })
-  .then(watcher => ({ watcher, sitemaps: json2html.sitemaps() }))
+  .then(watcher =>
+    typeof json2html.sitemaps === 'function'
+    ? buildSitemap(dest, json2html.sitemaps()).then(() => watcher)
+    : watcher
+  )
 })
-.then(({ watcher, sitemaps }) =>
-  !sitemaps
-  ? watcher
-  : buildSitemap(dest, sitemaps).then(() => watcher)
-)
 
 const buildSitemap = (dest, { sitemapXml, robotsTxt }) =>
   Promise.all([

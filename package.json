@@ -1,12 +1,12 @@
 {
   "name": "ahub",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": "kthjm/ahub",
   "author": "kthjm <toxictoxer@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
   "bin": "bin/ahub.js",
-  "description": "Generate site that is just a hub",
+  "description": "Generate site that is just a hub.",
   "keywords": [
     "website",
     "cms",
@@ -32,10 +32,12 @@
     "ahub:src": "yarn nwb src/bin.index.js"
   },
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "atra": "^1.2.3",
     "browser-sync": "^2.24.6",
     "chalk": "^2.4.1",
     "chin": "^3.1.2",
+    "chin-plugin-imagemin": "^0.0.4",
     "commander": "^2.16.0",
     "figures": "^2.0.0",
     "fs-extra": "^7.0.0",

@@ -1,27 +1,32 @@
 import React from 'react'
 import Atra from 'atra'
-import { Hidden } from './util.js'
-import { arr2nesty } from '../util.js'
+import { Hidden, arr2nesty } from './util.js'
 
 const LENGTH = 2
 const BLOCK_MARGIN = 4
 
-const Links = ({ links }) =>
+export default ({ links, rowLength }) =>
+<Links {...{
+  links,
+  rowLength: typeof rowLength === 'number' && rowLength > 0 ? rowLength : LENGTH
+}} />
+
+const Links = ({ links, rowLength }) =>
 <div {...{ style: { color: '#b7b7b7' } }}>
-  {arr2nesty(links, LENGTH).map((rowLinks, rowLinksIndex) =>
+  {arr2nesty(links, rowLength).map((rowLinks, rowLinksIndex) =>
   <div key={rowLinksIndex} style={{ display: 'flex' }}>
 
     {rowLinks.map(({ href, image, title, hub }, linkIndex) =>
-    <Link key={linkIndex} {...{ width: 1 / LENGTH * 100 + '%', margin: BLOCK_MARGIN }}>
+    <Link key={linkIndex} {...{ width: 1 / rowLength * 100 + '%', margin: BLOCK_MARGIN }}>
       <Title {...{ title }}  />
       <HrefImage {...{ href, image }} />
       <HrefHub {...{ href: hub }} />
     </Link>)}
 
-    {LENGTH - rowLinks.length > 0 && <Supple {...{
+    {rowLength - rowLinks.length > 0 && <Supple {...{
       margin: BLOCK_MARGIN,
-      flexLength: LENGTH,
-      blankLength: LENGTH - rowLinks.length
+      flexLength: rowLength,
+      blankLength: rowLength - rowLinks.length
     }} />}
 
   </div>)}
@@ -134,5 +139,3 @@ const Supple = ({ margin, flexLength, blankLength }) =>
     margin: `0px ${margin * blankLength}px ${margin}px ${margin * blankLength}px`
   }
 }} />
-
-export default Links

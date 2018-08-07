@@ -4,6 +4,8 @@ import createTag from 'html-tag'
 import Head from './Head.js'
 import Body from './Body.js'
 
+const Ahub = (props = {}) => <Html {...normalizeProps(props)} />
+
 const Html = ({ pathname, lang, head, body }) =>
 <html lang={!lang ? undefined : lang}>
   <Head {...head} />
@@ -21,14 +23,14 @@ const normalizeProps = ({
 }) => ({
   pathname,
   lang: !inherit ? lang : lang || indexJson.lang,
-  head: normalizeHead(inherit, indexJson.head, head, faviconsHtml),
-  body: normalizeBody(inherit, indexJson.body, body)
+  head: normalizeHead(inherit, head, indexJson.head, faviconsHtml),
+  body: normalizeBody(inherit, body, indexJson.body)
 })
 
 const normalizeHead = (
   inherit,
-  indexHead = {},
   { title, og, ga, tags } = {},
+  indexHead = {},
   faviconsHtml
 ) =>
 !inherit
@@ -47,19 +49,21 @@ const normalizeHead = (
 
 const normalizeBody = (
   inherit,
-  { background: indexBackground, color: indexColor } = {},
-  { background, color, header, links } = {}
+  { background, color, linksRowLength, header, links } = {},
+  { background: indexBackground, color: indexColor, linksRowLength: indexLinksRowLength } = {},
 ) =>
 !inherit
 ? {
   background,
   color,
+  linksRowLength,
   header,
   links
 }
 : {
-  background: background || indexBackground,
-  color:      color      || indexColor,
+  background:     background     || indexBackground,
+  color:          color          || indexColor,
+  linksRowLength: linksRowLength || indexLinksRowLength,
   header,
   links
 }
@@ -68,8 +72,5 @@ const tags2markup = (tags) =>
   !Array.isArray(tags)
   ? ''
   : tags.filter(Array.isArray).map(arg => createTag(...arg)).join('')
-
-const Ahub = (props = {}) =>
-  <Html {...normalizeProps(props)} />
 
 export default Ahub

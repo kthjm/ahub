@@ -1,6 +1,7 @@
-export const createConfig = (src = '', dest = '') => ({
-  src,
-  dest,
+export const createConfig = (src = '', dest = '') =>
+`module.exports = {
+  src: '${src}',
+  dest: '${dest}',
   ignored: [],
   sitemap: {
     hostname: 'https://foo.com'
@@ -8,7 +9,7 @@ export const createConfig = (src = '', dest = '') => ({
   favicons: {},
   chokidar: {},
   browsersync: {}
-})
+}`
 
 export const createPage = (isIndex, embed) =>
 !isIndex
@@ -25,10 +26,10 @@ export const createPage = (isIndex, embed) =>
     ga: '',
     tags: []
   },
-  body: Object.assign({ background: 'silver', color: '#ffffff' }, bodyUnique(embed))
+  body: Object.assign({ background: 'silver', color: '#ffffff', linksRowLength: 2 }, bodyUnique(embed))
 }
 
-const bodyUnique = ({ title, hub, hub2 } = {}) => ({
+const bodyUnique = ({ title, hub } = {}) => ({
   header: {
     image: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
     title: title || '{ title }',
@@ -36,7 +37,7 @@ const bodyUnique = ({ title, hub, hub2 } = {}) => ({
   },
   links: !hub
   ? [ link() ]
-  : [ link({ title: 'title' }), link({ hub: hub }), link({ title: 'title', hub: hub2 || hub }) ]
+  : [ link({ title: 'title' }), link({ hub: hub }), link({ title: 'title', hub: hub }) ]
 })
 
 const link = ({ title = '', hub = '' } = {}) => ({

@@ -1,14 +1,14 @@
 import * as chin from 'chin'
 import { relative as pathRelative, sep as pathSep } from 'path'
-import { CONFIG } from './variables.js'
+import { CONFIG, FAVICONS } from './variables.js'
 
 const defaultIgnored = [
   CONFIG,
+  `${FAVICONS}.*`,
   'node_modules**',
   '.git**',
   'README.md',
   'LICENSE',
-  'favicons.*',
   'package.json',
   'yarn.lock',
   'yarn-error.log',
@@ -24,10 +24,10 @@ export default ({
   out,
   verbose,
   processors,
-  userIgnored,
-  chokidarOpts,
+  ignored: userIgnored,
+  watch: userWatch,
 }) => {
-  const build = chin[chokidarOpts ? 'watch' : 'chin']
+  const build = chin[userWatch ? 'watch' : 'chin']
 
   const ignored = [].concat(
     defaultIgnored,
@@ -35,7 +35,7 @@ export default ({
     Array.isArray(userIgnored) ? userIgnored : []
   )
 
-  const watch = Object.assign({ ignored, ignoreInitial: true }, chokidarOpts)
+  const watch = Object.assign({ ignored, ignoreInitial: true }, userWatch)
 
   return build({ put, out, verbose, processors, ignored, watch })
 }
