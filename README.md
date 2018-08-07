@@ -32,7 +32,7 @@ yarn ahub serve
 Transformed to `html`.
 
 ### _favicons.[ext]
-Passed to [`favicons`](https://github.com/itgalaxy/favicons).
+Passed to [`favicons`](https://github.com/itgalaxy/favicons) as source.
 
 ### _image/
 Optimized.
