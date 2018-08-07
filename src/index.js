@@ -40,7 +40,7 @@ Promise.resolve()
   : buildFavicons(src, dest, favicons)
 )
 .then(faviconsHtml => {
-  const json2html = j2h((props, pathname) => template(props, pathname, faviconsHtml), { sitemap })
+  const json2html = j2h((pathname, json) => template(pathname, json, faviconsHtml), { sitemap })
   return buildPages({
     put: src,
     out: dest,

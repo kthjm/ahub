@@ -26,14 +26,14 @@ export default (template, options) => {
   }
 
   const processor = (jsonstring, { out }) => {
-    const props = JSON.parse(jsonstring)
+    const json = JSON.parse(jsonstring)
     const reout = Object.assign(out, { ext: '.html' }, out.name !== 'index' && { dir: pathJoin(out.dir, out.name), name: 'index' })
     const pathname = urlResolve('', reout.dir.split(process.env.CHIN_OUT)[1] || '/')
 
-    if (sitemaps && !isCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(props) })
+    if (sitemaps && !isCreated) sitemapUrls.push({ url: pathname, img: createSitemapImg(json) })
 
     return Promise.resolve()
-    .then(() => template(props, pathname))
+    .then(() => template(pathname, json))
     .then(html => [
       pathFormat(reout),
       // '<!DOCTYPE html>' + html
