@@ -102,7 +102,7 @@ export const init = (src = SRC, dest = DEST) => Promise.all(
   .map(arg => outputFile(...arg))
 )
 
-const jtringify = (obj) => JSON.stringify(obj, null, '\t')
+const jtringify = (obj) => JSON.stringify(obj, null, '  ')
 
 const filename = (path) => {
   const splited = normalize(path).split(sep)
