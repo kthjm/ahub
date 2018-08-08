@@ -15,7 +15,7 @@ export const createPage = (isIndex, embed) =>
 !isIndex
 ? {
   inherit: true,
-  body: createBody(embed)
+  body: createBody(false, embed)
 }
 : {
   lang: '',
@@ -26,22 +26,32 @@ export const createPage = (isIndex, embed) =>
     ga: '',
     tags: []
   },
-  body: Object.assign({ background: 'silver', color: '#ffffff', linksRowLength: 2 }, createBody(embed))
+  body: Object.assign({ background: 'silver', color: '#ffffff' }, createBody(true, embed))
 }
 
-const createBody = ({ title, hub } = {}) => ({
-  header: {
-    image: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
-    title: title || '{ title }',
-    href: '',
-    description: '{ description }'
-  },
-  links: !hub
-  ? [ link() ]
-  : [ link({ title: 'title' }), link({ hub: hub }), link({ title: 'title', hub: hub }) ]
+const createBody = (isIndex, { title, hub } = {}) => ({
+  icon: 'https://imgplaceholder.com/150x150/f3f3f3/c0c0c0/glyphicon-picture?font-size=90',
+  title: title || '{ title }',
+  href: '',
+  description: '{ description }',
+  links: !isIndex
+  ? {
+    contents: createContents(hub)
+  }
+  : {
+    background: '',
+    color: '',
+    rowLength: 2,
+    contents: createContents(hub)
+  }
 })
 
-const link = ({ title = '', hub = '' } = {}) => ({
+const createContents = (hub) =>
+!hub
+? [ createLink() ]
+: [ createLink({ title: 'title' }), createLink({ hub: hub }), createLink({ title: 'title', hub: hub }) ]
+
+const createLink = ({ title = '', hub = '' } = {}) => ({
   title: title,
   image: 'https://image.flaticon.com/icons/svg/25/25231.svg',
   href: 'https://github.com/',

@@ -6,15 +6,14 @@ const Body = ({
   pathname,
   background,
   color,
-  linksRowLength,
   header = {},
-  links = []
+  links = {}
 }) =>
-<body {...{ style: { background, color } }}>
+<body {...{ style: { background: background || undefined, color: color || undefined } }}>
   {pathname !== '/' && <ToRoot />}
   <main>
     <Header {...header} />
-    <Links {...{ links, rowLength: linksRowLength }} />
+    <Links {...links} />
   </main>
 </body>
 
@@ -25,11 +24,11 @@ const ToRoot = () =>
   </a>
 </div>
 
-const Header = ({ image, title, href, description }) =>
+const Header = ({ icon, title, href, description }) =>
 <header>
-  {image &&
+  {icon &&
   <div id={'header_image'}>
-    <div {...{ style: { backgroundImage: `url(${image})` } }} />
+    <div {...{ style: { backgroundImage: `url(${icon})` } }} />
   </div>}
   {!title && !href ? false :
   <h1 id={'header_title'}>
