@@ -3,6 +3,7 @@ src/
 .babelrc
 .gitattributes
 .gitignore
+chin.config.js
 codecov.yml
 rollup.config.js
 script.prestart.js
