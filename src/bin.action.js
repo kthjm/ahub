@@ -16,7 +16,7 @@ const getConfig = (configPath) =>
   ? rooquireP(configPath)
   : rooquireP(CONFIG).catch(() => ({}))
 
-const normalizeConfig = ({ src, dest, Html, configPath, isProduct, isWatch }) =>
+const normalizeConfig = ({ src, dest, component, configPath, isProduct, isWatch }) =>
   Promise.resolve()
   .then(() => getConfig(configPath))
   .then(config => ({
@@ -34,14 +34,22 @@ const normalizeConfig = ({ src, dest, Html, configPath, isProduct, isWatch }) =>
     return pathExists(indexJsonPath).then(isExist =>
       !isExist
       ? throws(`[src]/index.json is required`)
-      : Object.assign(config, { template: createTemplate(Html, indexJsonPath) })
+      : Object.assign(config, { template: createTemplate(component, indexJsonPath) })
     )
   })
 
 export const createTemplate = (Html, indexJsonPath) =>
   (pathname, json, faviconsHtml) =>
     readJson(indexJsonPath).then(indexJson =>
-      render(<Html {...json} {...{ pathname, indexJson, faviconsHtml }} />))
+      render(
+        <Html
+          {...json}
+          {...{ pathname }}
+          inherited={indexJson}
+          headEmbedHtml={faviconsHtml}
+        />
+      )
+    )
 
 export const build = (ahub, options, verbose) =>
 normalizeConfig(Object.assign({}, options, { isProduct: true }))
@@ -102,7 +110,7 @@ export const init = (src = SRC, dest = DEST) => Promise.all(
   .map(arg => outputFile(...arg))
 )
 
-const jtringify = (obj) => JSON.stringify(obj, null, '\t')
+const jtringify = (obj) => JSON.stringify(obj, null, '  ')
 
 const filename = (path) => {
   const splited = normalize(path).split(sep)

@@ -39,7 +39,7 @@ export default [
   },
   {
     plugins,
-    input: 'src/Html/index.js',
+    input: 'src/component/index.js',
     output: { format: 'cjs', file: 'component/index.js' }
   },
   {

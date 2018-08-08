@@ -18,39 +18,39 @@ const normalizeProps = ({
   head,
   body,
   pathname,
-  indexJson = {},
-  faviconsHtml = ''
+  inherited = {},
+  headEmbedHtml
 }) => ({
   pathname,
-  lang: !inherit ? lang : lang || indexJson.lang,
-  head: normalizeHead(inherit, head, indexJson.head, faviconsHtml),
-  body: normalizeBody(inherit, body, indexJson.body)
+  lang: !inherit ? lang : lang || inherited.lang,
+  head: normalizeHead(inherit, head, inherited.head, typeof headEmbedHtml === 'string' ? headEmbedHtml : ''),
+  body: normalizeBody(inherit, body, inherited.body)
 })
 
 const normalizeHead = (
   inherit,
   { title, og, ga, tags } = {},
-  indexHead = {},
-  faviconsHtml
+  inheritedHead = {},
+  headEmbedHtml
 ) =>
 !inherit
 ? {
   title,
   og,
   ga,
-  embed: h2r(tags2markup(tags) + faviconsHtml)
+  embed: h2r(tags2markup(tags) + headEmbedHtml)
 }
 : {
-  title: title || indexHead.title,
-  og:    og    || indexHead.og,
-  ga:    ga    || indexHead.ga,
-  embed: h2r((tags2markup(tags) || tags2markup(indexHead.tags)) + faviconsHtml)
+  title: title || inheritedHead.title,
+  og:    og    || inheritedHead.og,
+  ga:    ga    || inheritedHead.ga,
+  embed: h2r((tags2markup(tags) || tags2markup(inheritedHead.tags)) + headEmbedHtml)
 }
 
 const normalizeBody = (
   inherit,
   { background, color, linksRowLength, header, links } = {},
-  { background: indexBackground, color: indexColor, linksRowLength: indexLinksRowLength } = {},
+  inheritedBody = {}
 ) =>
 !inherit
 ? {
@@ -61,9 +61,9 @@ const normalizeBody = (
   links
 }
 : {
-  background:     background     || indexBackground,
-  color:          color          || indexColor,
-  linksRowLength: linksRowLength || indexLinksRowLength,
+  background:     background     || inheritedBody.background,
+  color:          color          || inheritedBody.color,
+  linksRowLength: linksRowLength || inheritedBody.linksRowLength,
   header,
   links
 }

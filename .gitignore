@@ -2,9 +2,10 @@
 .put/
 .out/
 ahub.config.js
+/assets/
 bin/
+/component/
 dist/
-component/
 
 # Logs
 logs
