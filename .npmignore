@@ -1,7 +1,6 @@
 .circleci/
 src/
 .babelrc
-.gitattributes
 .gitignore
 chin.config.js
 codecov.yml
