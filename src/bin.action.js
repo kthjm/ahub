@@ -41,7 +41,15 @@ const normalizeConfig = ({ src, dest, component, configPath, isProduct, isWatch 
 export const createTemplate = (Html, indexJsonPath) =>
   (pathname, json, faviconsHtml) =>
     readJson(indexJsonPath).then(indexJson =>
-      render(<Html {...json} {...{ pathname, indexJson, faviconsHtml }} />))
+      render(
+        <Html
+          {...json}
+          {...{ pathname }}
+          inherited={indexJson}
+          headEmbedHtml={faviconsHtml}
+        />
+      )
+    )
 
 export const build = (ahub, options, verbose) =>
 normalizeConfig(Object.assign({}, options, { isProduct: true }))
