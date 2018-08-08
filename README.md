@@ -28,7 +28,7 @@ yarn ahub serve
     ahub.config.js
     package.json
 
-### [name].json
+### [page].json
 Transformed to `html`.
 
 ### _favicons.[ext]
@@ -41,7 +41,7 @@ Optimized.
 - `svg`
 - `gif`
 
-## Page.json
+## [page].json
 ```json
 {
   "inherit": false,
@@ -50,13 +50,6 @@ Optimized.
   "body": {}
 }
 ```
-### inherit
-Indicate whether to inherit the following properties from `index.json`.
-- `lang`
-- `head`
-- `body.background`
-- `body.color`
-- `body.linksRowLength`
 
 ### head
 #### `title`
@@ -76,23 +69,35 @@ Array to contain tuple for [`html-tag`](https://github.com/jonschlinkert/html-ta
 {
   "background": "",
   "color": "",
-  "linksRowLength": 2,
-  "header": {
-    "image": "",
-    "title": "",
-    "href": "",
-    "description": "" // able to use html.
-  },
-  "links": [
-    {
-      "title": "",
-      "image": "",
-      "href": "", // target="_blank"
-      "hub": ""   // target="_self"
-    }
-  ]
+  "icon": "",
+  "title": "",
+  "href": "",
+  "description": "" // able to use html.
+  "links": {
+    "background": "",
+    "color": "",
+    "rowLength": 2,
+    "contents": [
+      {
+        "title": "",
+        "image": "",
+        "href": "", // target="_blank"
+        "hub": ""   // target="_self"
+      }
+    ]
+  }
 }
 ```
+
+### inherit
+Indicate whether to inherit the following properties from `index.json`.
+- `lang`
+- `head`
+- `body.background`
+- `body.color`
+- `body.links.background`
+- `body.links.color`
+- `body.links.rowLength`
 
 ## ahub.config.js
 ```js

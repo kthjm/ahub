@@ -49,23 +49,50 @@ const normalizeHead = (
 
 const normalizeBody = (
   inherit,
-  { background, color, linksRowLength, header, links } = {},
+  { background, color, icon, title, href, description, links } = {},
   inheritedBody = {}
 ) =>
 !inherit
 ? {
   background,
   color,
-  linksRowLength,
-  header,
+  header: {
+    icon,
+    title,
+    href,
+    description,
+  },
   links
 }
 : {
-  background:     background     || inheritedBody.background,
-  color:          color          || inheritedBody.color,
-  linksRowLength: linksRowLength || inheritedBody.linksRowLength,
-  header,
-  links
+  background: background || inheritedBody.background,
+  color:      color      || inheritedBody.color,
+  header: {
+    icon,
+    title,
+    href,
+    description,
+  },
+  links: normalizeLinks(inherit, links, inheritedBody.links)
+}
+
+const normalizeLinks = (
+  inherit,
+  { background, color, rowLength, contents } = {},
+  inheritedLinks = {}
+) =>
+!inherit
+? {
+  background,
+  color,
+  rowLength,
+  contents
+}
+: {
+  background: background || inheritedLinks.background,
+  color:      color      || inheritedLinks.color,
+  rowLength:  rowLength  || inheritedLinks.rowLength,
+  contents
 }
 
 const tags2markup = (tags) =>
