@@ -22,10 +22,13 @@
   "scripts": {
     "test": "cross-env BABEL_ENV=TEST nyc mocha --no-timeouts",
     "coverage": "nyc report --reporter=lcov && codecov",
-    "build": "cross-env BABEL_ENV=BUILD rollup -c",
+    "build:roll": "cross-env BABEL_ENV=BUILD rollup -c",
+    "build:chin": "chin -c",
+    "build": "run-s build:roll build:chin",
     "prestart": "node script.prestart.js",
-    "start": "run-p watch:src watch:out",
-    "watch:src": "nodemon -w src -w script.start.js -x \"node script.start.js\"",
+    "start": "run-p watch:ass watch:src watch:out",
+    "watch:ass": "chin watch -c",
+    "watch:src": "nodemon -w src -i src/component/assets -x \"node script.start.js\"",
     "watch:out": "browser-sync start -w --no-notify --server .out",
     "nwb": "cross-env BABEL_ENV=ENV node -r babel-register",
     "ahub": "node bin/ahub.js",
@@ -74,6 +77,7 @@
     "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-prettier": "^0.4.0"
+    "rollup-plugin-prettier": "^0.4.0",
+    "stylus": "^0.54.5"
   }
 }

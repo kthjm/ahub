@@ -2,7 +2,7 @@ import program from 'commander'
 import { cross } from 'figures'
 import { red } from 'chalk'
 import ahub from '..'
-import Html from '../component'
+import component from '../component'
 import { init, create, serve, build } from './bin.action.js'
 import { SRC, DEST, CONFIG } from './variables.js'
 
@@ -52,7 +52,7 @@ program
 .option('-q, --quiet', 'without log')
 .on('--help', () => console.log(``))
 .action((src, dest, { config: configPath, quiet }) =>
-  serve(ahub, { src, dest, Html, configPath }, !quiet)
+  serve(ahub, { src, dest, component, configPath }, !quiet)
   .catch(errorHandler)
 )
 
@@ -63,7 +63,7 @@ program
 .option('-q, --quiet', 'without log')
 .on('--help', () => console.log(``))
 .action((src, dest, { config: configPath, quiet }) =>
-  build(ahub, { src, dest, Html, configPath }, !quiet)
+  build(ahub, { src, dest, component, configPath }, !quiet)
   .catch(errorHandler)
 )
 
