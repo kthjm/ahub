@@ -2,7 +2,7 @@ import React from 'react'
 import { Hidden, arr2nesty } from './util.js'
 
 const LENGTH       = 2
-const BLOCK_MARGIN = 4
+const BLOCK_MARGIN = 0.3 // em
 const COLOR        = '#b7b7b7'
 
 export default ({ links, rowLength }) =>
@@ -51,6 +51,6 @@ const SuppleBlock = ({ margin, flexLength, blankLength }) =>
   style: {
     width: `${1 / flexLength * 100 * blankLength}%`,
     padding: `20px ${20 * blankLength}px`,
-    margin: `0px ${margin * blankLength}px ${margin}px ${margin * blankLength}px`
+    margin: `0px ${margin * blankLength}em ${margin}em ${margin * blankLength}em`
   }
 }} />
