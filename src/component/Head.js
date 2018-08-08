@@ -9,9 +9,9 @@ const Head = ({ og, ga, title, embed }) =>
   <script dangerouslySetInnerHTML={{ __html: gtag(ga) }} />
   </Fragment>}
   {title && <title>{title}</title>}
-  {embed}
   <link {...{ type: 'text/css', rel: 'stylesheet', href: '/_ahub.css' }} />
   <script dangerouslySetInnerHTML={{ __html: `(${setBodyFontSize.toString()})()` }} />
+  {embed}
 </head>
 
 /* https://developers.google.com/analytics/devguides/collection/gtagjs/ */
