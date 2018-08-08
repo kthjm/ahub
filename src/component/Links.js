@@ -3,7 +3,7 @@ import { Hidden, arr2nesty } from './util.js'
 
 const LENGTH       = 2
 const BLOCK_MARGIN = 0.3 // em
-const COLOR        = '#b7b7b7'
+const COLOR        = '#2d2d2d'
 
 export default ({ links, rowLength }) =>
 <Links {...{
@@ -41,7 +41,7 @@ const LinkBlock = ({ width, title, image, href, hub }) =>
   {hub &&
   <div className={'link_hub'}>
     <a {...{ href: hub }}>
-      {`<${hub}>`}
+      {hub}
     </a>
   </div>}
 </div>
